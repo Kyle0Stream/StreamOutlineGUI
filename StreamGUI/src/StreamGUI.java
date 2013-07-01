@@ -7,6 +7,6 @@ public class StreamGUI {
     
     public static void main(String[] args) 
     {
-        
+        System.out.println("Hello Stream World.");
     }
 }
