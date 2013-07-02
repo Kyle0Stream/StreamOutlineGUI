@@ -11978,3 +11978,6 @@
 11959) Magenta Pixel found at = 3860,3300
 11960) Magenta Pixel found at = 3860,3301
 11961) Magenta Pixel found at = 3861,3301
+Total Amount of Red pixels: 7
+Total Amount of Magenta pixels: 11961
+Total Amount of Yellow pixels: 12
