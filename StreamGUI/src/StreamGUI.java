@@ -28,9 +28,6 @@
  * @author kl0601084
  */
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -47,31 +44,36 @@ public class StreamGUI extends JFrame
     private static final int FRAME_HEIGHT = 100;
     private static final int SIDE_LENGTH = 8;
     private static final int fieldWidth = 15;
+    
+    private JPanel bottom;
+    
     private JLabel fileNameLabel;
-//    private JLabel cornerALabel;
     private JTextField fileNameText;
-//    private JTextField cornerAText;
-    private JButton button;
-    private JLabel resultLabel;
-    private JPanel panel;
+    private JButton browse;
+   
+    private JLabel cornerALabel;
+    private JTextField cornerAText;
+    
+    private JLabel cornerBLabel;
+    private JTextField cornerBText;
+    
+    private JLabel cornerCLabel;
+    private JTextField cornerCText;
+    
+    private JLabel cornerDLabel;
+    private JTextField cornerDText;
     
     public StreamGUI()
     {
-        resultLabel = new JLabel();
-       // updateLabelDisplay();
-       
+        bottom = new JPanel();
         //CREATES TEXT FIELD FOR FILENAME
         fileNameLabel = new JLabel("Filename: ");
         fileNameText = new JTextField(fieldWidth);
         
-        //CREATES TEXT FIELD FOR cornerA
-//        cornerALabel = new JLabel("cornerA: ");
-//        cornerAText = new JTextField(fieldWidth);
-        
         //CREATES BUTTON
-        button = new JButton("Browse");
+        browse = new JButton("Browse");
         
-        class buttonListener implements ActionListener
+        class browseListener implements ActionListener
         {
             @Override
             public void actionPerformed(ActionEvent event)
@@ -80,22 +82,39 @@ public class StreamGUI extends JFrame
                 if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
                 {
                     File myfile = chooser.getSelectedFile();
-                    fileNameLabel.setText(myfile.getName());
+                    fileNameText.setText(myfile.getName());
                 }
             }
         }
-        ActionListener listener = new buttonListener();
-        button.addActionListener(listener);
+        ActionListener listener = new browseListener();
+        browse.addActionListener(listener);
         
+        //CREATES TEXT FIELD AND LABEL FOR CORNER A-D
+        cornerALabel = new JLabel("Corner A (X,Y): ");
+        cornerAText = new JTextField(5);
+        
+        cornerBLabel = new JLabel("Corner B (X,Y): ");
+        cornerBText = new JTextField(5);
+        
+        cornerCLabel = new JLabel("Corner C (X,Y): ");
+        cornerCText = new JTextField(5);
+        
+        cornerDLabel = new JLabel("Corner D (X,Y): ");
+        cornerDText = new JTextField(5);
+
         //CREATES PANEL
-        panel = new JPanel();
-        panel.add(fileNameLabel);
-        panel.add(fileNameText);
-//        panel.add(cornerALabel);
-//        panel.add(cornerAText);
-        panel.add(button);
-        panel.add(resultLabel);
-        this.add(panel);
+        bottom.add(fileNameLabel);
+        bottom.add(fileNameText);
+        bottom.add(browse);
+        bottom.add(cornerALabel);
+        bottom.add(cornerAText);
+        bottom.add(cornerBLabel);
+        bottom.add(cornerBText);
+        bottom.add(cornerCLabel);
+        bottom.add(cornerCText);
+        bottom.add(cornerDLabel);
+        bottom.add(cornerDText);
+        this.add(bottom);
     }
 
     public static void main(String[] args) 
