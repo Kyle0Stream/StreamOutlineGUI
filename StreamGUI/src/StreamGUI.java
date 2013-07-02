@@ -28,6 +28,9 @@
  * @author kl0601084
  */
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -45,7 +48,9 @@ public class StreamGUI extends JFrame
     private static final int SIDE_LENGTH = 8;
     private static final int fieldWidth = 15;
     private JLabel fileNameLabel;
+//    private JLabel cornerALabel;
     private JTextField fileNameText;
+//    private JTextField cornerAText;
     private JButton button;
     private JLabel resultLabel;
     private JPanel panel;
@@ -58,6 +63,10 @@ public class StreamGUI extends JFrame
         //CREATES TEXT FIELD FOR FILENAME
         fileNameLabel = new JLabel("Filename: ");
         fileNameText = new JTextField(fieldWidth);
+        
+        //CREATES TEXT FIELD FOR cornerA
+//        cornerALabel = new JLabel("cornerA: ");
+//        cornerAText = new JTextField(fieldWidth);
         
         //CREATES BUTTON
         button = new JButton("Browse");
@@ -82,11 +91,13 @@ public class StreamGUI extends JFrame
         panel = new JPanel();
         panel.add(fileNameLabel);
         panel.add(fileNameText);
+//        panel.add(cornerALabel);
+//        panel.add(cornerAText);
         panel.add(button);
         panel.add(resultLabel);
         this.add(panel);
     }
-    
+
     public static void main(String[] args) 
     {
         JFrame frame = new StreamGUI();
