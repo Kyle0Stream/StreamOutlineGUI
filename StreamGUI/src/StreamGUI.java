@@ -30,7 +30,14 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -40,6 +47,8 @@ import javax.swing.JTextField;
 
 public class StreamGUI extends JFrame
 {
+    private FileWriter log;
+    private BufferedWriter out;
     private static final int FRAME_WIDTH = 400;
     private static final int FRAME_HEIGHT = 100;
     private static final int SIDE_LENGTH = 8;
@@ -62,6 +71,14 @@ public class StreamGUI extends JFrame
     
     private JLabel cornerDLabel;
     private JTextField cornerDText;
+    
+    private JLabel sideLengthLabel;
+    private JTextField sideLengthText;
+    
+    private JLabel hfovLabel;
+    private JTextField hfovText;
+    
+    private JButton done;
     
     public StreamGUI()
     {
@@ -86,8 +103,8 @@ public class StreamGUI extends JFrame
                 }
             }
         }
-        ActionListener listener = new browseListener();
-        browse.addActionListener(listener);
+        ActionListener fileName = new browseListener();
+        browse.addActionListener(fileName);
         
         //CREATES TEXT FIELD AND LABEL FOR CORNER A-D
         cornerALabel = new JLabel("Corner A (X,Y): ");
@@ -101,6 +118,49 @@ public class StreamGUI extends JFrame
         
         cornerDLabel = new JLabel("Corner D (X,Y): ");
         cornerDText = new JTextField(5);
+        
+        sideLengthLabel = new JLabel("Square Side Length: ");
+        sideLengthText = new JTextField(5);
+        
+        hfovLabel = new JLabel("HFOV: ");
+        hfovText = new JTextField(5);
+
+        done = new JButton("DONE");
+        MouseListener listener = new MouseListener() 
+        { 
+            @Override
+            public void mousePressed(MouseEvent event) 
+            {
+                try 
+                {
+                    out.write("CornerA (X,Y): " + cornerAText.getText());
+                    out.newLine();
+                    out.write("CornerB (X,Y): " + cornerBText.getText());
+                    out.write("CornerC (X,Y): " + cornerCText.getText());
+                    out.newLine();
+                    out.write("CornerD (X,Y): " + cornerDText.getText());
+                    out.newLine();
+                    out.write("Square Side Length: " + sideLengthText.getText());
+                    out.newLine();
+                    out.write("HFOV: " + hfovText.getText());
+                    out.newLine();
+                    out.close();
+                } catch (IOException ex) 
+                {
+                    Logger.getLogger(StreamGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } 
+            @Override
+            public void mouseReleased(MouseEvent event) {}
+            @Override
+            public void mouseClicked(MouseEvent event) {}
+            @Override
+            public void mouseEntered(MouseEvent event) {}
+            @Override
+            public void mouseExited(MouseEvent event) {}
+        };
+
+        done.addMouseListener(listener);
 
         //CREATES PANEL
         bottom.add(fileNameLabel);
@@ -114,15 +174,22 @@ public class StreamGUI extends JFrame
         bottom.add(cornerCText);
         bottom.add(cornerDLabel);
         bottom.add(cornerDText);
+        bottom.add(sideLengthLabel);
+        bottom.add(sideLengthText);
+        bottom.add(hfovLabel);
+        bottom.add(hfovText);
+        bottom.add(done);
         this.add(bottom);
     }
 
-    public static void main(String[] args) 
+    public static void main(String[] args) throws IOException
     {
         JFrame frame = new StreamGUI();
         frame.setTitle("StreamGUI");
         frame.setSize(350,400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+        FileWriter log = new FileWriter("E:/log.txt");
+        BufferedWriter out = new BufferedWriter(log);
     }
 }
