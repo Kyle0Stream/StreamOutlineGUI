@@ -27,10 +27,72 @@
  *
  * @author kl0601084
  */
-public class StreamGUI {
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class StreamGUI extends JFrame
+{
+    private static final int FRAME_WIDTH = 400;
+    private static final int FRAME_HEIGHT = 100;
+    private static final int SIDE_LENGTH = 8;
+    private static final int fieldWidth = 15;
+    private JLabel fileNameLabel;
+    private JTextField fileNameText;
+    private JButton button;
+    private JLabel resultLabel;
+    private JPanel panel;
+    
+    public StreamGUI()
+    {
+        resultLabel = new JLabel();
+       // updateLabelDisplay();
+       
+        //CREATES TEXT FIELD FOR FILENAME
+        fileNameLabel = new JLabel("Filename: ");
+        fileNameText = new JTextField(fieldWidth);
+        
+        //CREATES BUTTON
+        button = new JButton("Browse");
+        
+        class buttonListener implements ActionListener
+        {
+            @Override
+            public void actionPerformed(ActionEvent event)
+            {
+                JFileChooser chooser = new JFileChooser();
+                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+                {
+                    File myfile = chooser.getSelectedFile();
+                    fileNameLabel.setText(myfile.getName());
+                }
+            }
+        }
+        ActionListener listener = new buttonListener();
+        button.addActionListener(listener);
+        
+        //CREATES PANEL
+        panel = new JPanel();
+        panel.add(fileNameLabel);
+        panel.add(fileNameText);
+        panel.add(button);
+        panel.add(resultLabel);
+        this.add(panel);
+    }
     
     public static void main(String[] args) 
     {
-        System.out.println("Hello Stream World.");
+        JFrame frame = new StreamGUI();
+        frame.setTitle("StreamGUI");
+        frame.setSize(350,400);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
     }
 }
