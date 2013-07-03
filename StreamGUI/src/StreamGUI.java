@@ -30,14 +30,10 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -47,47 +43,57 @@ import javax.swing.JTextField;
 
 public class StreamGUI extends JFrame
 {
-    private FileWriter log;
-    private BufferedWriter out;
+    private static FileWriter log;
+    private static BufferedWriter out;
     private static final int FRAME_WIDTH = 400;
     private static final int FRAME_HEIGHT = 100;
     private static final int SIDE_LENGTH = 8;
     private static final int fieldWidth = 15;
     
-    private JPanel bottom;
+    private static JFrame frame;
+    private static JPanel bottom;
     
-    private JLabel fileNameLabel;
-    private JTextField fileNameText;
-    private JButton browse;
+    private static JLabel fileNameLabel;
+    private static JTextField fileNameText;
+    private static JButton browse;
    
-    private JLabel cornerALabel;
-    private JTextField cornerAText;
+    private static JLabel cornerAXLabel;
+    private static JTextField cornerAXText;
+    private static JLabel cornerAYLabel;
+    private static JTextField cornerAYText;
     
-    private JLabel cornerBLabel;
-    private JTextField cornerBText;
+    private static JLabel cornerBXLabel;
+    private static JTextField cornerBXText;
+    private static JLabel cornerBYLabel;
+    private static JTextField cornerBYText;
     
-    private JLabel cornerCLabel;
-    private JTextField cornerCText;
+    private static JLabel cornerCXLabel;
+    private static JTextField cornerCXText;
+    private static JLabel cornerCYLabel;
+    private static JTextField cornerCYText;
     
-    private JLabel cornerDLabel;
-    private JTextField cornerDText;
+    private static JLabel cornerDXLabel;
+    private static JTextField cornerDXText;
+    private static JLabel cornerDYLabel;
+    private static JTextField cornerDYText;
     
-    private JLabel sideLengthLabel;
-    private JTextField sideLengthText;
+    private static JLabel sideLengthLabel;
+    private static JTextField sideLengthText;
     
-    private JLabel hfovLabel;
-    private JTextField hfovText;
+    private static JLabel hfovLabel;
+    private static JTextField hfovText;
     
-    private JButton done;
+    private static JButton done;
     
     public StreamGUI()
     {
         bottom = new JPanel();
-        //CREATES TEXT FIELD FOR FILENAME
+
+        //CREATES TEXT FIELD AND LABEL for FILENAME 
         fileNameLabel = new JLabel("Filename: ");
         fileNameText = new JTextField(fieldWidth);
         
-        //CREATES BUTTON
+        //CREATES BROWSE BUTTON
         browse = new JButton("Browse");
         
         class browseListener implements ActionListener
@@ -106,74 +112,74 @@ public class StreamGUI extends JFrame
         ActionListener fileName = new browseListener();
         browse.addActionListener(fileName);
         
-        //CREATES TEXT FIELD AND LABEL FOR CORNER A-D
-        cornerALabel = new JLabel("Corner A (X,Y): ");
-        cornerAText = new JTextField(5);
+        //CREATES TEXT FIELDS AND LABELS FOR CORNER A-D, SIDELENGTH, AND HFOV
+        cornerAXLabel = new JLabel("Corner A (X): ");
+        cornerAXText = new JTextField(5);
         
-        cornerBLabel = new JLabel("Corner B (X,Y): ");
-        cornerBText = new JTextField(5);
+        cornerAYLabel = new JLabel("Corner A (Y): ");
+        cornerAYText = new JTextField(5);
         
-        cornerCLabel = new JLabel("Corner C (X,Y): ");
-        cornerCText = new JTextField(5);
+        cornerBXLabel = new JLabel("Corner B (X): ");
+        cornerBXText = new JTextField(5);
         
-        cornerDLabel = new JLabel("Corner D (X,Y): ");
-        cornerDText = new JTextField(5);
+        cornerBYLabel = new JLabel("Corner B (Y): ");
+        cornerBYText = new JTextField(5);
+        
+        cornerCXLabel = new JLabel("Corner C (X): ");
+        cornerCXText = new JTextField(5);
+        
+        cornerCYLabel = new JLabel("Corner C (Y): ");
+        cornerCYText = new JTextField(5);
+        
+        cornerDXLabel = new JLabel("Corner D (X): ");
+        cornerDXText = new JTextField(5);
+        
+        cornerDYLabel = new JLabel("Corner D (Y): ");
+        cornerDYText = new JTextField(5);
         
         sideLengthLabel = new JLabel("Square Side Length: ");
         sideLengthText = new JTextField(5);
         
         hfovLabel = new JLabel("HFOV: ");
         hfovText = new JTextField(5);
-
+        
+        //CREATES DONE BUTTON
         done = new JButton("DONE");
-        MouseListener listener = new MouseListener() 
-        { 
+        class doneListener implements ActionListener
+        {
             @Override
-            public void mousePressed(MouseEvent event) 
+            public void actionPerformed(ActionEvent event)
             {
-                try 
-                {
-                    out.write("CornerA (X,Y): " + cornerAText.getText());
-                    out.newLine();
-                    out.write("CornerB (X,Y): " + cornerBText.getText());
-                    out.write("CornerC (X,Y): " + cornerCText.getText());
-                    out.newLine();
-                    out.write("CornerD (X,Y): " + cornerDText.getText());
-                    out.newLine();
-                    out.write("Square Side Length: " + sideLengthText.getText());
-                    out.newLine();
-                    out.write("HFOV: " + hfovText.getText());
-                    out.newLine();
-                    out.close();
-                } catch (IOException ex) 
-                {
-                    Logger.getLogger(StreamGUI.class.getName()).log(Level.SEVERE, null, ex);
+                try {
+                    onDoneClick();
+                } catch (IOException ex) {
+                    System.out.println("IO Error");
                 }
-            } 
-            @Override
-            public void mouseReleased(MouseEvent event) {}
-            @Override
-            public void mouseClicked(MouseEvent event) {}
-            @Override
-            public void mouseEntered(MouseEvent event) {}
-            @Override
-            public void mouseExited(MouseEvent event) {}
-        };
-
-        done.addMouseListener(listener);
+            }
+        }
+        ActionListener doneButton = new doneListener();
+        done.addActionListener(doneButton);
 
         //CREATES PANEL
         bottom.add(fileNameLabel);
         bottom.add(fileNameText);
         bottom.add(browse);
-        bottom.add(cornerALabel);
-        bottom.add(cornerAText);
-        bottom.add(cornerBLabel);
-        bottom.add(cornerBText);
-        bottom.add(cornerCLabel);
-        bottom.add(cornerCText);
-        bottom.add(cornerDLabel);
-        bottom.add(cornerDText);
+        bottom.add(cornerAXLabel);
+        bottom.add(cornerAXText);
+        bottom.add(cornerAYLabel);
+        bottom.add(cornerAYText);
+        bottom.add(cornerBXLabel);
+        bottom.add(cornerBXText);
+        bottom.add(cornerBYLabel);
+        bottom.add(cornerBYText);
+        bottom.add(cornerCXLabel);
+        bottom.add(cornerCXText);
+        bottom.add(cornerCYLabel);
+        bottom.add(cornerCYText);
+        bottom.add(cornerDXLabel);
+        bottom.add(cornerDXText);
+        bottom.add(cornerDYLabel);
+        bottom.add(cornerDYText);
         bottom.add(sideLengthLabel);
         bottom.add(sideLengthText);
         bottom.add(hfovLabel);
@@ -181,15 +187,39 @@ public class StreamGUI extends JFrame
         bottom.add(done);
         this.add(bottom);
     }
+    
+    private void onDoneClick() throws IOException
+    {
+        out.write("Filename: " + fileNameText.getText());
+        out.newLine();
+        out.write("CornerA (X,Y): " + Double.parseDouble(cornerAXText.getText())
+                + ", " + Double.parseDouble(cornerAYText.getText()));
+        out.newLine();
+        out.write("CornerB (X,Y): " + Double.parseDouble(cornerBXText.getText())
+                + ", " + Double.parseDouble(cornerBYText.getText()));
+        out.newLine();
+        out.write("CornerC (X,Y): " + Double.parseDouble(cornerCXText.getText())
+                + ", " + Double.parseDouble(cornerCYText.getText()));
+        out.newLine();
+        out.write("CornerD (X,Y): " + Double.parseDouble(cornerDXText.getText())
+                + ", " + Double.parseDouble(cornerDYText.getText()));
+        out.newLine();
+        out.write("Square Side Length: " + Double.parseDouble(sideLengthText.getText()));
+        out.newLine();
+        out.write("HFOV: " + Double.parseDouble(hfovText.getText()));
+        out.newLine();
+        out.close();
+        frame.dispose();
+    }
 
     public static void main(String[] args) throws IOException
     {
-        JFrame frame = new StreamGUI();
+        frame = new StreamGUI();
         frame.setTitle("StreamGUI");
-        frame.setSize(350,400);
+        frame.setSize(350,230);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        FileWriter log = new FileWriter("E:/log.txt");
-        BufferedWriter out = new BufferedWriter(log);
+        log = new FileWriter("E:/log.txt");
+        out = new BufferedWriter(log);
     }
 }
