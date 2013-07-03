@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -58,8 +59,11 @@ public class StreamGUI extends JFrame
     public static int redCount = 0;
     private static File myfile;
     
-    private static JFrame frame;
+    private static JFrame frameOne;
+    private static JFrame frameTwo;
     private static JPanel bottom;
+    
+    private static JLabel pictureLabel;
     
     private static JLabel fileNameLabel;
     private static JTextField fileNameText;
@@ -117,6 +121,7 @@ public class StreamGUI extends JFrame
                         picImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
                         fileNameText.setText(myfile.getName());
+                        addImage();
                     } catch (IOException ex) 
                     {
                         System.out.println("IO Error");
@@ -205,6 +210,17 @@ public class StreamGUI extends JFrame
         this.add(bottom);
     }
     
+    private void addImage()
+    {
+        pictureLabel = new JLabel(new ImageIcon(picImage));
+        frameTwo = new JFrame();
+        frameTwo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameTwo.getContentPane().add(pictureLabel);
+        frameTwo.pack();
+        frameTwo.setTitle("Browsed Picture Shown Below");
+        frameTwo.setLocation(350,0);
+        frameTwo.setVisible(true);
+    }
     private void onDoneClick() throws IOException
     {
         out.write("Filename: " + fileNameText.getText());
@@ -230,7 +246,8 @@ public class StreamGUI extends JFrame
         out.newLine();
         getPixelColor();
         out.close();
-        frame.dispose();
+        frameOne.dispose();
+        frameTwo.dispose();
     }
     
     private void getPixelColor() throws IOException
@@ -271,12 +288,12 @@ public class StreamGUI extends JFrame
 
     public static void main(String[] args) throws IOException
     {
-        frame = new StreamGUI();
-        frame.setTitle("StreamGUI");
-        frame.setSize(350,230);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        log = new FileWriter("E:/log.txt");
+        frameOne = new StreamGUI();
+        frameOne.setTitle("StreamGUI");
+        frameOne.setSize(350,230);
+        frameOne.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameOne.setVisible(true);
+        log = new FileWriter("E:/picImageInput.txt");
         out = new BufferedWriter(log);
     }
 }
