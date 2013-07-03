@@ -28,6 +28,7 @@
  * @author kl0601084
  */
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -35,8 +36,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -54,6 +53,9 @@ public class StreamGUI extends JFrame
     private static final int FRAME_HEIGHT = 100;
     private static final int SIDE_LENGTH = 8;
     private static final int fieldWidth = 15;
+    public static int yellowCount = 0;
+    public static int magentaCount = 0;
+    public static int redCount = 0;
     private static File myfile;
     
     private static JFrame frame;
@@ -110,11 +112,13 @@ public class StreamGUI extends JFrame
                 JFileChooser chooser = new JFileChooser();
                 if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
                 {
-                    try {
+                    try 
+                    {
                         picImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
                         fileNameText.setText(myfile.getName());
-                    } catch (IOException ex) {
+                    } catch (IOException ex) 
+                    {
                         System.out.println("IO Error");
                     }
                 }
@@ -161,9 +165,11 @@ public class StreamGUI extends JFrame
             @Override
             public void actionPerformed(ActionEvent event)
             {
-                try {
+                try 
+                {
                     onDoneClick();
-                } catch (IOException ex) {
+                } catch (IOException ex) 
+                {
                     System.out.println("IO Error");
                 }
             }
@@ -222,8 +228,45 @@ public class StreamGUI extends JFrame
         out.newLine();
         out.write("HFOV: " + Double.parseDouble(hfovText.getText()));
         out.newLine();
+        getPixelColor();
         out.close();
         frame.dispose();
+    }
+    
+    private void getPixelColor() throws IOException
+    {
+        for(int y = 0; y < picImage.getHeight(); y++)
+        {
+            for(int x = 0; x < picImage.getWidth(); x++)
+            {
+                Color c = new Color(picImage.getRGB(x,y));
+                
+                if (c.getRed() == 255 && c.getGreen() == 255 && c.getBlue() == 0)
+                {
+                    yellowCount++;
+                    out.write(yellowCount + ") " + "Yellow Pixel found at = " + x + "," + y);
+                    out.newLine();
+                }
+                if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 255)
+                {
+                    magentaCount++;
+                    out.write(magentaCount + ") " + "Magenta Pixel found at = " + x + "," + y);
+                    out.newLine();
+                }
+                if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 0)
+                {
+                    redCount++;
+                    out.write(redCount + ") " + "Red Pixel found at = " + x + "," + y);
+                    out.newLine();
+                }
+            }
+        }
+        out.write("Total Amount of Red pixels: " + redCount);
+        out.newLine();
+        out.write("Total Amount of Magenta pixels: " + magentaCount);
+        out.newLine();
+        out.write("Total Amount of Yellow pixels: " + yellowCount);
+        out.close();
     }
 
     public static void main(String[] args) throws IOException
