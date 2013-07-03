@@ -30,10 +30,14 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -45,10 +49,12 @@ public class StreamGUI extends JFrame
 {
     private static FileWriter log;
     private static BufferedWriter out;
+    private static BufferedImage picImage;
     private static final int FRAME_WIDTH = 400;
     private static final int FRAME_HEIGHT = 100;
     private static final int SIDE_LENGTH = 8;
     private static final int fieldWidth = 15;
+    private static File myfile;
     
     private static JFrame frame;
     private static JPanel bottom;
@@ -104,8 +110,13 @@ public class StreamGUI extends JFrame
                 JFileChooser chooser = new JFileChooser();
                 if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
                 {
-                    File myfile = chooser.getSelectedFile();
-                    fileNameText.setText(myfile.getName());
+                    try {
+                        picImage = ImageIO.read(chooser.getSelectedFile());
+                        myfile = chooser.getSelectedFile();
+                        fileNameText.setText(myfile.getName());
+                    } catch (IOException ex) {
+                        System.out.println("IO Error");
+                    }
                 }
             }
         }
@@ -191,6 +202,9 @@ public class StreamGUI extends JFrame
     private void onDoneClick() throws IOException
     {
         out.write("Filename: " + fileNameText.getText());
+        out.newLine();
+        out.write("Image Height, Width: " + picImage.getHeight() + ", " 
+                + picImage.getWidth());
         out.newLine();
         out.write("CornerA (X,Y): " + Double.parseDouble(cornerAXText.getText())
                 + ", " + Double.parseDouble(cornerAYText.getText()));
