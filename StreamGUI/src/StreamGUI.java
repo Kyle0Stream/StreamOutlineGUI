@@ -1,4 +1,3 @@
-
 /* Notes by Forrest (7/1/2013)
  * 
  *  Things to get from the image (e.g. DSCN001.JPG or DSCN001.PNG) itself:  
@@ -29,6 +28,7 @@
  */
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -50,6 +50,7 @@ public class StreamGUI extends JFrame
     private static FileWriter log;
     private static BufferedWriter out;
     private static BufferedImage picImage;
+    private static BufferedImage resize;
     private static final int FRAME_WIDTH = 400;
     private static final int FRAME_HEIGHT = 100;
     private static final int SIDE_LENGTH = 8;
@@ -212,15 +213,27 @@ public class StreamGUI extends JFrame
     
     private void addImage()
     {
-        pictureLabel = new JLabel(new ImageIcon(picImage));
+        resize = resizeImage(picImage, BufferedImage.TYPE_INT_ARGB, 900,600);
+        pictureLabel = new JLabel(new ImageIcon(resize));
         frameTwo = new JFrame();
         frameTwo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frameTwo.getContentPane().add(pictureLabel);
         frameTwo.pack();
         frameTwo.setTitle("Browsed Picture Shown Below");
         frameTwo.setLocation(350,0);
+        frameTwo.setSize(1000,700);
         frameTwo.setVisible(true);
     }
+    
+    private static BufferedImage resizeImage(BufferedImage originalImage, int type, int Width,int Height)
+    {
+       BufferedImage resizedImage = new BufferedImage(Width, Height, type);
+       Graphics2D g = resizedImage.createGraphics();
+       g.drawImage(originalImage, 0, 0, Width, Height, null);
+       g.dispose();
+       return resizedImage;
+    }
+
     private void onDoneClick() throws IOException
     {
         out.write("Filename: " + fileNameText.getText());
