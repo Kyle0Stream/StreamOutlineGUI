@@ -29,20 +29,26 @@
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 public class StreamGUI extends JFrame
@@ -55,10 +61,12 @@ public class StreamGUI extends JFrame
     private static final int FRAME_HEIGHT = 100;
     private static final int SIDE_LENGTH = 8;
     private static final int fieldWidth = 15;
+    private static int clickCount = 0;
     public static int yellowCount = 0;
     public static int magentaCount = 0;
     public static int redCount = 0;
     private static File myfile;
+    private static ArrayList<Point>yellowPoints;
     
     private static JFrame frameOne;
     private static JFrame frameTwo;
@@ -122,6 +130,7 @@ public class StreamGUI extends JFrame
                         picImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
                         fileNameText.setText(myfile.getName());
+                        getPixelColor();
                         addImage();
                     } catch (IOException ex) 
                     {
@@ -176,7 +185,8 @@ public class StreamGUI extends JFrame
                     onDoneClick();
                 } catch (IOException ex) 
                 {
-                    System.out.println("IO Error");
+                    System.out.println(ex);
+                    ex.printStackTrace();
                 }
             }
         }
@@ -213,15 +223,74 @@ public class StreamGUI extends JFrame
     
     private void addImage()
     {
-        resize = resizeImage(picImage, BufferedImage.TYPE_INT_ARGB, 900,600);
-        pictureLabel = new JLabel(new ImageIcon(resize));
+//        resize = resizeImage(picImage, BufferedImage.TYPE_INT_ARGB, 800,600);
+//        pictureLabel = new JLabel(new ImageIcon(resize));
+        pictureLabel = new JLabel(new ImageIcon(picImage));
         frameTwo = new JFrame();
+        MouseListener listener = new MouseListener() 
+        { 
+            @Override
+            public void mousePressed(MouseEvent event) 
+            {
+                    if(clickCount==0)
+                    {
+                        double AX = (event.getX() + 0.5);
+                        double AY = (event.getY() + 0.5);
+                        String strAX = String.valueOf(AX);
+                        String strAY = String.valueOf(AY);
+                        cornerAXText.setText(strAX);
+                        cornerAYText.setText(strAY);
+                    }
+                    if(clickCount==1)
+                    {
+                        double BX = (event.getX() + 0.5);
+                        double BY = (event.getY() + 0.5);
+                        String strBX = String.valueOf(BX);
+                        String strBY = String.valueOf(BY);
+                        cornerBXText.setText(strBX);
+                        cornerBYText.setText(strBY);
+                    }
+                    if(clickCount==2)
+                    {
+                        double CX = (event.getX() + 0.5);
+                        double CY = (event.getY() + 0.5);
+                        String strCX = String.valueOf(CX);
+                        String strCY = String.valueOf(CY);
+                        cornerCXText.setText(strCX);
+                        cornerCYText.setText(strCY);
+                    }
+                    if(clickCount==3)
+                    {
+                        double DX = (event.getX() + 0.5);
+                        double DY = (event.getY() + 0.5);
+                        String strDX = String.valueOf(DX);
+                        String strDY = String.valueOf(DY);
+                        cornerDXText.setText(strDX);
+                        cornerDYText.setText(strDY);
+                    }
+                    clickCount++;
+            }
+            @Override
+            public void mouseReleased(MouseEvent event) {}
+            @Override
+            public void mouseClicked(MouseEvent event) {}
+            @Override
+            public void mouseEntered(MouseEvent event) {}
+            @Override
+            public void mouseExited(MouseEvent event) {}
+        };
+        pictureLabel.addMouseListener(listener);
         frameTwo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frameTwo.getContentPane().add(pictureLabel);
         frameTwo.pack();
+        JScrollPane scrollBar=new JScrollPane(pictureLabel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        frameTwo.add(scrollBar);
+        JOptionPane.showMessageDialog(frameTwo, "Click on the four corners of the "
+                + "same square to fill in points A-D.", "Information", JOptionPane.INFORMATION_MESSAGE);
         frameTwo.setTitle("Browsed Picture Shown Below");
         frameTwo.setLocation(350,0);
-        frameTwo.setSize(1000,700);
+        frameTwo.setSize(900,700);
         frameTwo.setVisible(true);
     }
     
@@ -236,6 +305,7 @@ public class StreamGUI extends JFrame
 
     private void onDoneClick() throws IOException
     {
+        out.newLine();
         out.write("Filename: " + fileNameText.getText());
         out.newLine();
         out.write("Image Height, Width: " + picImage.getHeight() + ", " 
@@ -257,12 +327,11 @@ public class StreamGUI extends JFrame
         out.newLine();
         out.write("HFOV: " + Double.parseDouble(hfovText.getText()));
         out.newLine();
-        getPixelColor();
         out.close();
         frameOne.dispose();
         frameTwo.dispose();
     }
-    
+
     private void getPixelColor() throws IOException
     {
         for(int y = 0; y < picImage.getHeight(); y++)
@@ -274,31 +343,34 @@ public class StreamGUI extends JFrame
                 if (c.getRed() == 255 && c.getGreen() == 255 && c.getBlue() == 0)
                 {
                     yellowCount++;
-                    out.write(yellowCount + ") " + "Yellow Pixel found at = " + x + "," + y);
+                    out.write(yellowCount + ") " + "Yellow Pixel found at = " 
+                            + (x+0.5) + "," + (y+0.5));
                     out.newLine();
+                    //yellowPoints.add(new Point(x,y));
                 }
                 if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 255)
                 {
                     magentaCount++;
-                    out.write(magentaCount + ") " + "Magenta Pixel found at = " + x + "," + y);
+                    out.write(magentaCount + ") " + "Magenta Pixel found at = " 
+                            + (x+0.5) + "," + (y+0.5));
                     out.newLine();
                 }
                 if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 0)
                 {
                     redCount++;
-                    out.write(redCount + ") " + "Red Pixel found at = " + x + "," + y);
+                    out.write(redCount + ") " + "Red Pixel found at = " 
+                            + (x+0.5) + "," + (y+0.5));
                     out.newLine();
                 }
             }
         }
+        System.out.println(yellowPoints);
         out.write("Total Amount of Red pixels: " + redCount);
         out.newLine();
         out.write("Total Amount of Magenta pixels: " + magentaCount);
         out.newLine();
         out.write("Total Amount of Yellow pixels: " + yellowCount);
-        out.close();
     }
-
     public static void main(String[] args) throws IOException
     {
         frameOne = new StreamGUI();
