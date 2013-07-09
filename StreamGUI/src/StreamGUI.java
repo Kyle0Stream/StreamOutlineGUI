@@ -53,67 +53,80 @@ import javax.swing.JTextField;
 
 public class StreamGUI extends JFrame
 {
-    private static FileWriter log;
-    private static BufferedWriter out;
-    private static BufferedImage picImage;
-    private static BufferedImage resize;
-    private static final int FRAME_WIDTH = 400;
-    private static final int FRAME_HEIGHT = 100;
-    private static final int SIDE_LENGTH = 8;
-    private static final int fieldWidth = 15;
-    private static int clickCount = 0;
-    public static int yellowCount = 0;
-    public static int magentaCount = 0;
-    public static int redCount = 0;
-    private static File myfile;
-    private static ArrayList<Point>yellowPoints;
-    private static JFileChooser chooser = new JFileChooser();
+    private FileWriter log;
+    private BufferedWriter out;
+    private BufferedImage pointsImage;
+    private BufferedImage outlineImage;
+    private BufferedImage resize;
+    private final int FRAME_WIDTH = 400;
+    private final int FRAME_HEIGHT = 100;
+    private final int SIDE_LENGTH = 8;
+    private final int fieldWidth = 15;
+    private int clickCount = 0;
     
-    private static JFrame frameOne;
-    private static JFrame frameTwo;
-    private static JFrame frameThree;
-    private static JPanel bottom;
+    public int yellowCountOutline = 0;
+    public int magentaCountOutline = 0;
+    public int redCountOutline = 0;
+    public int yellowCountPoints = 0;
+    public int magentaCountPoints = 0;
+    public int redCountPoints = 0;
+    private ArrayList<Point>yellowPoints;
+    private ArrayList<Point>redPoints;
+    private ArrayList<Point>magentaPoints;
+    private ArrayList<Point>yellowOutline;
+    private ArrayList<Point>redOutline;
+    private ArrayList<Point>magentaOutline;
     
-    private static JLabel pictureLabel;
+    private File myfile;
     
-    private static JLabel pointsLabel;
-    private static JTextField pointsText;
-    private static JButton pointsBrowse;
+    private JFileChooser chooser = new JFileChooser();
     
-    private static JLabel outlineLabel;
-    private static JTextField outlineText;
-    private static JButton outlineBrowse;
+    private JFrame framePoints;
+    private JFrame frameOutline;
+    private JPanel bottom;
+    
+    private JLabel pictureLabel;
+    
+    private JLabel pointsLabel;
+    private JTextField pointsText;
+    private JButton pointsBrowse;
+    
+    private JLabel outlineLabel;
+    private JTextField outlineText;
+    private JButton outlineBrowse;
    
-    private static JLabel cornerAXLabel;
-    private static JTextField cornerAXText;
-    private static JLabel cornerAYLabel;
-    private static JTextField cornerAYText;
+    private JLabel cornerAXLabel;
+    private JTextField cornerAXText;
+    private JLabel cornerAYLabel;
+    private JTextField cornerAYText;
     
-    private static JLabel cornerBXLabel;
-    private static JTextField cornerBXText;
-    private static JLabel cornerBYLabel;
-    private static JTextField cornerBYText;
+    private JLabel cornerBXLabel;
+    private JTextField cornerBXText;
+    private JLabel cornerBYLabel;
+    private JTextField cornerBYText;
     
-    private static JLabel cornerCXLabel;
-    private static JTextField cornerCXText;
-    private static JLabel cornerCYLabel;
-    private static JTextField cornerCYText;
+    private JLabel cornerCXLabel;
+    private JTextField cornerCXText;
+    private JLabel cornerCYLabel;
+    private JTextField cornerCYText;
     
-    private static JLabel cornerDXLabel;
-    private static JTextField cornerDXText;
-    private static JLabel cornerDYLabel;
-    private static JTextField cornerDYText;
+    private JLabel cornerDXLabel;
+    private JTextField cornerDXText;
+    private JLabel cornerDYLabel;
+    private JTextField cornerDYText;
     
-    private static JLabel sideLengthLabel;
-    private static JTextField sideLengthText;
+    private JLabel sideLengthLabel;
+    private JTextField sideLengthText;
     
-    private static JLabel hfovLabel;
-    private static JTextField hfovText;
+    private JLabel hfovLabel;
+    private JTextField hfovText;
     
-    private static JButton done;
+    private JButton done;
     
-    public StreamGUI()
+    public StreamGUI() throws IOException
     {
+        out = new BufferedWriter(new FileWriter("E:/picImageInput.txt"));
+
         bottom = new JPanel();
 
         //CREATES TEXT FIELD AND LABEL for POINTS BROWSE
@@ -132,7 +145,7 @@ public class StreamGUI extends JFrame
                 {
                     try 
                     {
-                        picImage = ImageIO.read(chooser.getSelectedFile());
+                        pointsImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
                         pointsText.setText(myfile.getName());
                         getPixelColor();
@@ -163,7 +176,7 @@ public class StreamGUI extends JFrame
                 {
                     try 
                     {
-                        picImage = ImageIO.read(chooser.getSelectedFile());
+                        outlineImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
                         outlineText.setText(myfile.getName());
                         getPixelColor();
@@ -205,6 +218,8 @@ public class StreamGUI extends JFrame
         
         sideLengthLabel = new JLabel("Square Side Length: ");
         sideLengthText = new JTextField(5);
+        String strSide = String.valueOf(SIDE_LENGTH);
+        sideLengthText.setText(strSide);
         
         hfovLabel = new JLabel("HFOV: ");
         hfovText = new JTextField(5);
@@ -259,30 +274,32 @@ public class StreamGUI extends JFrame
         bottom.add(done);
         this.add(bottom);
     }
-        private void addOutline()
+    
+    private void addOutline()
     {
-        pictureLabel = new JLabel(new ImageIcon(picImage));
-        frameThree = new JFrame();
-        frameThree.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frameThree.getContentPane().add(pictureLabel);
-        frameThree.pack();
+        pictureLabel = new JLabel(new ImageIcon(outlineImage));
+        frameOutline = new JFrame();
+        frameOutline.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameOutline.getContentPane().add(pictureLabel);
+        frameOutline.pack();
         JScrollPane scrollBar=new JScrollPane(pictureLabel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        frameThree.add(scrollBar);
+        frameOutline.add(scrollBar);
+        pictureLabel.setBackground(Color.black);
 //        JOptionPane.showMessageDialog(frameTwo, "Click on the four corners of the "
 //                + "same square to fill in points A-D.", "Information", JOptionPane.INFORMATION_MESSAGE);
-        frameThree.setTitle("Stream Outline");
-        frameThree.setLocation(350,0);
-        frameThree.setSize(900,700);
-        frameThree.setVisible(true);
+        frameOutline.setTitle("Stream Outline");
+        frameOutline.setLocation(350,0);
+        frameOutline.setSize(900,700);
+        frameOutline.setVisible(true);
     }
         
     private void addSqPtsCtrlPts()
     {
 //        resize = resizeImage(picImage, BufferedImage.TYPE_INT_ARGB, 800,600);
 //        pictureLabel = new JLabel(new ImageIcon(resize));
-        pictureLabel = new JLabel(new ImageIcon(picImage));
-        frameTwo = new JFrame();
+        pictureLabel = new JLabel(new ImageIcon(pointsImage));
+        framePoints = new JFrame();
         MouseListener listener = new MouseListener() 
         { 
             @Override
@@ -336,18 +353,19 @@ public class StreamGUI extends JFrame
             public void mouseExited(MouseEvent event) {}
         };
         pictureLabel.addMouseListener(listener);
-        frameTwo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frameTwo.getContentPane().add(pictureLabel);
-        frameTwo.pack();
+        framePoints.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        framePoints.getContentPane().add(pictureLabel);
+        framePoints.pack();
+        pictureLabel.setBackground(Color.black);
         JScrollPane scrollBar=new JScrollPane(pictureLabel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        frameTwo.add(scrollBar);
-        JOptionPane.showMessageDialog(frameTwo, "Click on the four corners of the "
+        framePoints.add(scrollBar);
+        JOptionPane.showMessageDialog(framePoints, "Click on the four corners of the "
                 + "same square to fill in points A-D.", "Information", JOptionPane.INFORMATION_MESSAGE);
-        frameTwo.setTitle("Square Points and Control Points");
-        frameTwo.setLocation(350,0);
-        frameTwo.setSize(900,700);
-        frameTwo.setVisible(true);
+        framePoints.setTitle("Square Points and Control Points");
+        framePoints.setLocation(350,0);
+        framePoints.setSize(900,700);
+        framePoints.setVisible(true);
     }
     
     private static BufferedImage resizeImage(BufferedImage originalImage, int type, int Width,int Height)
@@ -362,10 +380,10 @@ public class StreamGUI extends JFrame
     private void onDoneClick() throws IOException
     {
         out.newLine();
-        out.write("Filename: " + pointsText.getText());
+        out.write("Points Filename: " + pointsText.getText());
         out.newLine();
-        out.write("Image Height, Width: " + picImage.getHeight() + ", " 
-                + picImage.getWidth());
+        out.write("Image Height, Width: " + pointsImage.getHeight() + ", " 
+                + pointsImage.getWidth());
         out.newLine();
         out.write("CornerA (X,Y): " + Double.parseDouble(cornerAXText.getText())
                 + ", " + Double.parseDouble(cornerAYText.getText()));
@@ -382,59 +400,74 @@ public class StreamGUI extends JFrame
         out.write("Square Side Length: " + Double.parseDouble(sideLengthText.getText()));
         out.newLine();
         out.write("HFOV: " + Double.parseDouble(hfovText.getText()));
+        out.write(yellowPoints.toString());
         out.newLine();
         out.close();
-        frameOne.dispose();
-        frameTwo.dispose();
+        this.dispose();
+        framePoints.dispose();
+        frameOutline.dispose();
     }
 
     private void getPixelColor() throws IOException
     {
-        for(int y = 0; y < picImage.getHeight(); y++)
+        for(int y = 0; y < pointsImage.getHeight(); y++)
         {
-            for(int x = 0; x < picImage.getWidth(); x++)
+            for(int x = 0; x < pointsImage.getWidth(); x++)
             {
-                Color c = new Color(picImage.getRGB(x,y));
+                Color c = new Color(pointsImage.getRGB(x,y));
                 
                 if (c.getRed() == 255 && c.getGreen() == 255 && c.getBlue() == 0)
                 {
-                    yellowCount++;
-                    out.write(yellowCount + ") " + "Yellow Pixel found at = " 
-                            + (x+0.5) + "," + (y+0.5));
-                    out.newLine();
-                    //yellowPoints.add(new Point(x,y));
+                    yellowCountPoints++;
+                    yellowPoints.add(new Point(x,y));
                 }
                 if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 255)
                 {
-                    magentaCount++;
-                    out.write(magentaCount + ") " + "Magenta Pixel found at = " 
-                            + (x+0.5) + "," + (y+0.5));
-                    out.newLine();
+                    redCountPoints++;
+                    redPoints.add(new Point(x,y));
                 }
                 if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 0)
                 {
-                    redCount++;
-                    out.write(redCount + ") " + "Red Pixel found at = " 
-                            + (x+0.5) + "," + (y+0.5));
-                    out.newLine();
+                    magentaCountPoints++;
+                    magentaPoints.add(new Point(x,y));
                 }
             }
         }
-        System.out.println(yellowPoints);
-        out.write("Total Amount of Red pixels: " + redCount);
-        out.newLine();
-        out.write("Total Amount of Magenta pixels: " + magentaCount);
-        out.newLine();
-        out.write("Total Amount of Yellow pixels: " + yellowCount);
+        for(int y = 0; y < outlineImage.getHeight(); y++)
+        {
+            for(int x = 0; x < outlineImage.getWidth(); x++)
+            {
+                Color c = new Color(outlineImage.getRGB(x,y));
+                
+                if (c.getRed() == 255 && c.getGreen() == 255 && c.getBlue() == 0)
+                {
+                    yellowCountOutline++;
+                    yellowOutline.add(new Point(x,y));
+                }
+                if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 255)
+                {
+                    magentaCountOutline++;
+                    magentaOutline.add(new Point(x,y));
+                }
+                if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 0)
+                {
+                    redCountOutline++;
+                    redOutline.add(new Point(x,y));
+                }
+            }
+        }
+//        out.write("Total Amount of Red pixels: " + redCount);
+//        out.newLine();
+//        out.write("Total Amount of Magenta pixels: " + magentaCount);
+//        out.newLine();
+//        out.write("Total Amount of Yellow pixels: " + yellowCount);
     }
     public static void main(String[] args) throws IOException
     {
-        frameOne = new StreamGUI();
-        frameOne.setTitle("StreamGUI");
-        frameOne.setSize(350,230);
-        frameOne.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frameOne.setVisible(true);
-        log = new FileWriter("E:/picImageInput.txt");
-        out = new BufferedWriter(log);
+        StreamGUI frameStreamGUI = new StreamGUI();
+        frameStreamGUI.setTitle("StreamGUI");
+        frameStreamGUI.setSize(350,260);
+        frameStreamGUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameStreamGUI.setVisible(true);
     }
 }
