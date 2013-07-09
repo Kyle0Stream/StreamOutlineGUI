@@ -67,16 +67,22 @@ public class StreamGUI extends JFrame
     public static int redCount = 0;
     private static File myfile;
     private static ArrayList<Point>yellowPoints;
+    private static JFileChooser chooser = new JFileChooser();
     
     private static JFrame frameOne;
     private static JFrame frameTwo;
+    private static JFrame frameThree;
     private static JPanel bottom;
     
     private static JLabel pictureLabel;
     
-    private static JLabel fileNameLabel;
-    private static JTextField fileNameText;
-    private static JButton browse;
+    private static JLabel pointsLabel;
+    private static JTextField pointsText;
+    private static JButton pointsBrowse;
+    
+    private static JLabel outlineLabel;
+    private static JTextField outlineText;
+    private static JButton outlineBrowse;
    
     private static JLabel cornerAXLabel;
     private static JTextField cornerAXText;
@@ -110,28 +116,27 @@ public class StreamGUI extends JFrame
     {
         bottom = new JPanel();
 
-        //CREATES TEXT FIELD AND LABEL for FILENAME 
-        fileNameLabel = new JLabel("Filename: ");
-        fileNameText = new JTextField(fieldWidth);
+        //CREATES TEXT FIELD AND LABEL for POINTS BROWSE
+        pointsLabel = new JLabel("Points: ");
+        pointsText = new JTextField(fieldWidth);
         
         //CREATES BROWSE BUTTON
-        browse = new JButton("Browse");
+        pointsBrowse = new JButton("Browse");
         
-        class browseListener implements ActionListener
+        class pointsBrowseListener implements ActionListener
         {
             @Override
             public void actionPerformed(ActionEvent event)
             {
-                JFileChooser chooser = new JFileChooser();
                 if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
                 {
                     try 
                     {
                         picImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
-                        fileNameText.setText(myfile.getName());
+                        pointsText.setText(myfile.getName());
                         getPixelColor();
-                        addImage();
+                        addSqPtsCtrlPts();
                     } catch (IOException ex) 
                     {
                         System.out.println("IO Error");
@@ -139,8 +144,39 @@ public class StreamGUI extends JFrame
                 }
             }
         }
-        ActionListener fileName = new browseListener();
-        browse.addActionListener(fileName);
+        ActionListener fileName = new pointsBrowseListener();
+        pointsBrowse.addActionListener(fileName);
+        
+        //CREATES TEXT FIELD AND LABEL for OUTLINE BROWSE 
+        outlineLabel = new JLabel("Outline: ");
+        outlineText = new JTextField(fieldWidth);
+        
+        //CREATES BROWSE BUTTON
+        outlineBrowse = new JButton("Browse");
+        
+        class outlineBrowseListener implements ActionListener
+        {
+            @Override
+            public void actionPerformed(ActionEvent event)
+            {
+                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+                {
+                    try 
+                    {
+                        picImage = ImageIO.read(chooser.getSelectedFile());
+                        myfile = chooser.getSelectedFile();
+                        outlineText.setText(myfile.getName());
+                        getPixelColor();
+                        addOutline();
+                    } catch (IOException ex) 
+                    {
+                        System.out.println("IO Error");
+                    }
+                }
+            }
+        }
+        ActionListener fileName1 = new outlineBrowseListener();
+        outlineBrowse.addActionListener(fileName1);
         
         //CREATES TEXT FIELDS AND LABELS FOR CORNER A-D, SIDELENGTH, AND HFOV
         cornerAXLabel = new JLabel("Corner A (X): ");
@@ -194,9 +230,12 @@ public class StreamGUI extends JFrame
         done.addActionListener(doneButton);
 
         //CREATES PANEL
-        bottom.add(fileNameLabel);
-        bottom.add(fileNameText);
-        bottom.add(browse);
+        bottom.add(pointsLabel);
+        bottom.add(pointsText);
+        bottom.add(pointsBrowse);
+        bottom.add(outlineLabel);
+        bottom.add(outlineText);
+        bottom.add(outlineBrowse);
         bottom.add(cornerAXLabel);
         bottom.add(cornerAXText);
         bottom.add(cornerAYLabel);
@@ -220,8 +259,25 @@ public class StreamGUI extends JFrame
         bottom.add(done);
         this.add(bottom);
     }
-    
-    private void addImage()
+        private void addOutline()
+    {
+        pictureLabel = new JLabel(new ImageIcon(picImage));
+        frameThree = new JFrame();
+        frameThree.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameThree.getContentPane().add(pictureLabel);
+        frameThree.pack();
+        JScrollPane scrollBar=new JScrollPane(pictureLabel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        frameThree.add(scrollBar);
+//        JOptionPane.showMessageDialog(frameTwo, "Click on the four corners of the "
+//                + "same square to fill in points A-D.", "Information", JOptionPane.INFORMATION_MESSAGE);
+        frameThree.setTitle("Stream Outline");
+        frameThree.setLocation(350,0);
+        frameThree.setSize(900,700);
+        frameThree.setVisible(true);
+    }
+        
+    private void addSqPtsCtrlPts()
     {
 //        resize = resizeImage(picImage, BufferedImage.TYPE_INT_ARGB, 800,600);
 //        pictureLabel = new JLabel(new ImageIcon(resize));
@@ -288,7 +344,7 @@ public class StreamGUI extends JFrame
         frameTwo.add(scrollBar);
         JOptionPane.showMessageDialog(frameTwo, "Click on the four corners of the "
                 + "same square to fill in points A-D.", "Information", JOptionPane.INFORMATION_MESSAGE);
-        frameTwo.setTitle("Browsed Picture Shown Below");
+        frameTwo.setTitle("Square Points and Control Points");
         frameTwo.setLocation(350,0);
         frameTwo.setSize(900,700);
         frameTwo.setVisible(true);
@@ -306,7 +362,7 @@ public class StreamGUI extends JFrame
     private void onDoneClick() throws IOException
     {
         out.newLine();
-        out.write("Filename: " + fileNameText.getText());
+        out.write("Filename: " + pointsText.getText());
         out.newLine();
         out.write("Image Height, Width: " + picImage.getHeight() + ", " 
                 + picImage.getWidth());
