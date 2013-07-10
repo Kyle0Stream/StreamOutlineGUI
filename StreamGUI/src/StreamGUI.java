@@ -50,31 +50,26 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import streamoutlining.ImageUtils;
 
 public class StreamGUI extends JFrame
 {
-    private FileWriter log;
-    private BufferedWriter out;
+    private BufferedWriter miscInfo;
+    private BufferedWriter outline;
+    private BufferedWriter controlPoints;
+    private BufferedWriter squareCorners;
     private BufferedImage pointsImage;
     private BufferedImage outlineImage;
-    private BufferedImage resize;
-    private final int FRAME_WIDTH = 400;
-    private final int FRAME_HEIGHT = 100;
+//    private BufferedImage resize;
     private final int SIDE_LENGTH = 8;
     private final int fieldWidth = 15;
     private int clickCount = 0;
+    private int redPointsCount = 1;
+    private int yellowPointsCount = 1;
+    private int magentaOutlineCount = 1;
     
-    public int yellowCountOutline = 0;
-    public int magentaCountOutline = 0;
-    public int redCountOutline = 0;
-    public int yellowCountPoints = 0;
-    public int magentaCountPoints = 0;
-    public int redCountPoints = 0;
     private ArrayList<Point>yellowPoints;
     private ArrayList<Point>redPoints;
-    private ArrayList<Point>magentaPoints;
-    private ArrayList<Point>yellowOutline;
-    private ArrayList<Point>redOutline;
     private ArrayList<Point>magentaOutline;
     
     private File myfile;
@@ -125,7 +120,11 @@ public class StreamGUI extends JFrame
     
     public StreamGUI() throws IOException
     {
-        out = new BufferedWriter(new FileWriter("E:/picImageInput.txt"));
+        miscInfo = new BufferedWriter(new FileWriter("E:/miscInfo.txt"));
+        outline = new BufferedWriter(new FileWriter("E:/outline.txt"));
+        controlPoints = new BufferedWriter(new FileWriter("E:/controlPoints.txt"));
+        squareCorners = new BufferedWriter(new FileWriter("E:/squareCorners.txt"));
+        
 
         bottom = new JPanel();
 
@@ -148,7 +147,8 @@ public class StreamGUI extends JFrame
                         pointsImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
                         pointsText.setText(myfile.getName());
-                        getPixelColor();
+                        yellowPoints = ImageUtils.getPixelListForColor(pointsImage, Color.yellow);
+                        redPoints = ImageUtils.getPixelListForColor(pointsImage, Color.red);
                         addSqPtsCtrlPts();
                     } catch (IOException ex) 
                     {
@@ -179,7 +179,7 @@ public class StreamGUI extends JFrame
                         outlineImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
                         outlineText.setText(myfile.getName());
-                        getPixelColor();
+                        magentaOutline = ImageUtils.getPixelListForColor(outlineImage, Color.magenta);
                         addOutline();
                     } catch (IOException ex) 
                     {
@@ -286,8 +286,7 @@ public class StreamGUI extends JFrame
                 JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         frameOutline.add(scrollBar);
         pictureLabel.setBackground(Color.black);
-//        JOptionPane.showMessageDialog(frameTwo, "Click on the four corners of the "
-//                + "same square to fill in points A-D.", "Information", JOptionPane.INFORMATION_MESSAGE);
+        pictureLabel.setOpaque(true);
         frameOutline.setTitle("Stream Outline");
         frameOutline.setLocation(350,0);
         frameOutline.setSize(900,700);
@@ -296,7 +295,7 @@ public class StreamGUI extends JFrame
         
     private void addSqPtsCtrlPts()
     {
-//        resize = resizeImage(picImage, BufferedImage.TYPE_INT_ARGB, 800,600);
+//        resize = resizeImage(pointsImage, BufferedImage.TYPE_INT_ARGB, 800,600);
 //        pictureLabel = new JLabel(new ImageIcon(resize));
         pictureLabel = new JLabel(new ImageIcon(pointsImage));
         framePoints = new JFrame();
@@ -357,6 +356,7 @@ public class StreamGUI extends JFrame
         framePoints.getContentPane().add(pictureLabel);
         framePoints.pack();
         pictureLabel.setBackground(Color.black);
+        pictureLabel.setOpaque(true);
         JScrollPane scrollBar=new JScrollPane(pictureLabel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         framePoints.add(scrollBar);
@@ -379,89 +379,65 @@ public class StreamGUI extends JFrame
 
     private void onDoneClick() throws IOException
     {
-        out.newLine();
-        out.write("Points Filename: " + pointsText.getText());
-        out.newLine();
-        out.write("Image Height, Width: " + pointsImage.getHeight() + ", " 
+        miscInfo.write("Points Filename: " + pointsText.getText());
+        miscInfo.newLine();
+        miscInfo.write("Image Height, Width: " + pointsImage.getHeight() + ", " 
                 + pointsImage.getWidth());
-        out.newLine();
-        out.write("CornerA (X,Y): " + Double.parseDouble(cornerAXText.getText())
+        miscInfo.newLine();
+        miscInfo.write("CornerA (X,Y): " + Double.parseDouble(cornerAXText.getText())
                 + ", " + Double.parseDouble(cornerAYText.getText()));
-        out.newLine();
-        out.write("CornerB (X,Y): " + Double.parseDouble(cornerBXText.getText())
+        miscInfo.newLine();
+        miscInfo.write("CornerB (X,Y): " + Double.parseDouble(cornerBXText.getText())
                 + ", " + Double.parseDouble(cornerBYText.getText()));
-        out.newLine();
-        out.write("CornerC (X,Y): " + Double.parseDouble(cornerCXText.getText())
+        miscInfo.newLine();
+        miscInfo.write("CornerC (X,Y): " + Double.parseDouble(cornerCXText.getText())
                 + ", " + Double.parseDouble(cornerCYText.getText()));
-        out.newLine();
-        out.write("CornerD (X,Y): " + Double.parseDouble(cornerDXText.getText())
+        miscInfo.newLine();
+        miscInfo.write("CornerD (X,Y): " + Double.parseDouble(cornerDXText.getText())
                 + ", " + Double.parseDouble(cornerDYText.getText()));
-        out.newLine();
-        out.write("Square Side Length: " + Double.parseDouble(sideLengthText.getText()));
-        out.newLine();
-        out.write("HFOV: " + Double.parseDouble(hfovText.getText()));
-        out.write(yellowPoints.toString());
-        out.newLine();
-        out.close();
+        miscInfo.newLine();
+        miscInfo.write("Square Side Length: " + Double.parseDouble(sideLengthText.getText()));
+        miscInfo.newLine();
+        miscInfo.write("HFOV: " + Double.parseDouble(hfovText.getText()));
+        miscInfo.newLine();
+        miscInfo.write("Outline Filename: " + outlineText.getText());
+        miscInfo.newLine();
+        miscInfo.newLine();
+        miscInfo.write("Image Height, Width: " + outlineImage.getHeight() + ", " 
+                + outlineImage.getWidth());
+        miscInfo.newLine();
+        
+        //PIXEL LOCATIONS HERE (RED, YELLOW)
+        for (Point p: redPoints)
+        {
+            controlPoints.write(p.x + ", " + p.y);
+            controlPoints.newLine();
+            redPointsCount++;
+        }
+        
+        for (Point p: yellowPoints)
+        {
+            squareCorners.write(p.x + ", " + p.y);
+            squareCorners.newLine();
+            yellowPointsCount++;
+        }
+
+        //PIXEL LOCATIONS HERE (MAGENTA)
+        for (Point p: magentaOutline)
+        {
+            outline.write(p.x + ", " + p.y);
+            outline.newLine();
+            magentaOutlineCount++;
+        }
+        miscInfo.close();
+        controlPoints.close();
+        squareCorners.close();
+        outline.close();
         this.dispose();
         framePoints.dispose();
         frameOutline.dispose();
     }
 
-    private void getPixelColor() throws IOException
-    {
-        for(int y = 0; y < pointsImage.getHeight(); y++)
-        {
-            for(int x = 0; x < pointsImage.getWidth(); x++)
-            {
-                Color c = new Color(pointsImage.getRGB(x,y));
-                
-                if (c.getRed() == 255 && c.getGreen() == 255 && c.getBlue() == 0)
-                {
-                    yellowCountPoints++;
-                    yellowPoints.add(new Point(x,y));
-                }
-                if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 255)
-                {
-                    redCountPoints++;
-                    redPoints.add(new Point(x,y));
-                }
-                if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 0)
-                {
-                    magentaCountPoints++;
-                    magentaPoints.add(new Point(x,y));
-                }
-            }
-        }
-        for(int y = 0; y < outlineImage.getHeight(); y++)
-        {
-            for(int x = 0; x < outlineImage.getWidth(); x++)
-            {
-                Color c = new Color(outlineImage.getRGB(x,y));
-                
-                if (c.getRed() == 255 && c.getGreen() == 255 && c.getBlue() == 0)
-                {
-                    yellowCountOutline++;
-                    yellowOutline.add(new Point(x,y));
-                }
-                if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 255)
-                {
-                    magentaCountOutline++;
-                    magentaOutline.add(new Point(x,y));
-                }
-                if (c.getRed() == 255 && c.getGreen() == 0 && c.getBlue() == 0)
-                {
-                    redCountOutline++;
-                    redOutline.add(new Point(x,y));
-                }
-            }
-        }
-//        out.write("Total Amount of Red pixels: " + redCount);
-//        out.newLine();
-//        out.write("Total Amount of Magenta pixels: " + magentaCount);
-//        out.newLine();
-//        out.write("Total Amount of Yellow pixels: " + yellowCount);
-    }
     public static void main(String[] args) throws IOException
     {
         StreamGUI frameStreamGUI = new StreamGUI();
