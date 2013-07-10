@@ -27,7 +27,8 @@ public class ImageUtils {
      */
     public static BufferedImage overlay(BufferedImage topImg, BufferedImage bottomImg)
     {
-        BufferedImage combined = new BufferedImage(bottomImg.getWidth(), bottomImg.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage combined = new BufferedImage(bottomImg.getWidth(), 
+                bottomImg.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         // paint each image onto the new canvas
         Graphics g = combined.getGraphics();
@@ -105,7 +106,7 @@ public class ImageUtils {
         enlargePoints(combinedImg, squareCornersList, Color.yellow, 3);
         
         
-        JLabel pictureLabel = new JLabel(new ImageIcon(imgOutline));
+        JLabel pictureLabel = new JLabel(new ImageIcon(combinedImg));
         pictureLabel.setBackground(Color.black);
         pictureLabel.setOpaque(true);
         JFrame testFrame = new JFrame("ImageUtils Tester");
@@ -119,5 +120,4 @@ public class ImageUtils {
         testFrame.setSize(900,700);
         testFrame.setVisible(true);
     }
-    
 } 
