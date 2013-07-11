@@ -318,9 +318,9 @@ public class StreamGUI extends JFrame
                         int BX = (event.getX());
                         int BY = (event.getY());
                         Point pB = new Point(BX,BY);
-                        Point closestA = ImageUtils.getNearestPointFromList(pB, yellowPoints);
-                        String strBX = String.valueOf(closestA.x);
-                        String strBY = String.valueOf(closestA.y);
+                        Point closestB = ImageUtils.getNearestPointFromList(pB, yellowPoints);
+                        String strBX = String.valueOf(closestB.x);
+                        String strBY = String.valueOf(closestB.y);
                         cornerBXText.setText(strBX);
                         cornerBYText.setText(strBY);
                     }
@@ -329,9 +329,9 @@ public class StreamGUI extends JFrame
                         int CX = (event.getX());
                         int CY = (event.getY());
                         Point pC = new Point(CX,CY);
-                        Point closestA = ImageUtils.getNearestPointFromList(pC, yellowPoints);
-                        String strCX = String.valueOf(closestA.x);
-                        String strCY = String.valueOf(closestA.y);
+                        Point closestC = ImageUtils.getNearestPointFromList(pC, yellowPoints);
+                        String strCX = String.valueOf(closestC.x);
+                        String strCY = String.valueOf(closestC.y);
                         cornerCXText.setText(strCX);
                         cornerCYText.setText(strCY);
                     }
@@ -340,9 +340,9 @@ public class StreamGUI extends JFrame
                         int DX = (event.getX());
                         int DY = (event.getY());
                         Point pD = new Point(DX,DY);
-                        Point closestA = ImageUtils.getNearestPointFromList(pD, yellowPoints);
-                        String strDX = String.valueOf(closestA.x);
-                        String strDY = String.valueOf(closestA.y);
+                        Point closestD = ImageUtils.getNearestPointFromList(pD, yellowPoints);
+                        String strDX = String.valueOf(closestD.x);
+                        String strDY = String.valueOf(closestD.y);
                         cornerDXText.setText(strDX);
                         cornerDYText.setText(strDY);
                     }
