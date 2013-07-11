@@ -60,7 +60,6 @@ public class StreamGUI extends JFrame
     private BufferedWriter squareCorners;
     private BufferedImage pointsImage;
     private BufferedImage outlineImage;
-//    private BufferedImage resize;
     private final int SIDE_LENGTH = 8;
     private final int fieldWidth = 15;
     private int clickCount = 0;
@@ -295,8 +294,6 @@ public class StreamGUI extends JFrame
         
     private void addSqPtsCtrlPts()
     {
-//        resize = resizeImage(pointsImage, BufferedImage.TYPE_INT_ARGB, 800,600);
-//        pictureLabel = new JLabel(new ImageIcon(resize));
         pictureLabel = new JLabel(new ImageIcon(pointsImage));
         framePoints = new JFrame();
         MouseListener listener = new MouseListener() 
@@ -306,37 +303,46 @@ public class StreamGUI extends JFrame
             {
                     if(clickCount==0)
                     {
-                        double AX = (event.getX() + 0.5);
-                        double AY = (event.getY() + 0.5);
-                        String strAX = String.valueOf(AX);
-                        String strAY = String.valueOf(AY);
+                        
+                        int AX = (event.getX());
+                        int AY = (event.getY());
+                        Point pA = new Point(AX,AY);
+                        Point closestA = ImageUtils.getNearestPointFromList(pA, yellowPoints);
+                        String strAX = String.valueOf(closestA.x);
+                        String strAY = String.valueOf(closestA.y);
                         cornerAXText.setText(strAX);
                         cornerAYText.setText(strAY);
                     }
                     if(clickCount==1)
                     {
-                        double BX = (event.getX() + 0.5);
-                        double BY = (event.getY() + 0.5);
-                        String strBX = String.valueOf(BX);
-                        String strBY = String.valueOf(BY);
+                        int BX = (event.getX());
+                        int BY = (event.getY());
+                        Point pB = new Point(BX,BY);
+                        Point closestA = ImageUtils.getNearestPointFromList(pB, yellowPoints);
+                        String strBX = String.valueOf(closestA.x);
+                        String strBY = String.valueOf(closestA.y);
                         cornerBXText.setText(strBX);
                         cornerBYText.setText(strBY);
                     }
                     if(clickCount==2)
                     {
-                        double CX = (event.getX() + 0.5);
-                        double CY = (event.getY() + 0.5);
-                        String strCX = String.valueOf(CX);
-                        String strCY = String.valueOf(CY);
+                        int CX = (event.getX());
+                        int CY = (event.getY());
+                        Point pC = new Point(CX,CY);
+                        Point closestA = ImageUtils.getNearestPointFromList(pC, yellowPoints);
+                        String strCX = String.valueOf(closestA.x);
+                        String strCY = String.valueOf(closestA.y);
                         cornerCXText.setText(strCX);
                         cornerCYText.setText(strCY);
                     }
                     if(clickCount==3)
                     {
-                        double DX = (event.getX() + 0.5);
-                        double DY = (event.getY() + 0.5);
-                        String strDX = String.valueOf(DX);
-                        String strDY = String.valueOf(DY);
+                        int DX = (event.getX());
+                        int DY = (event.getY());
+                        Point pD = new Point(DX,DY);
+                        Point closestA = ImageUtils.getNearestPointFromList(pD, yellowPoints);
+                        String strDX = String.valueOf(closestA.x);
+                        String strDY = String.valueOf(closestA.y);
                         cornerDXText.setText(strDX);
                         cornerDYText.setText(strDY);
                     }
@@ -368,15 +374,6 @@ public class StreamGUI extends JFrame
         framePoints.setVisible(true);
     }
     
-    private static BufferedImage resizeImage(BufferedImage originalImage, int type, int Width,int Height)
-    {
-       BufferedImage resizedImage = new BufferedImage(Width, Height, type);
-       Graphics2D g = resizedImage.createGraphics();
-       g.drawImage(originalImage, 0, 0, Width, Height, null);
-       g.dispose();
-       return resizedImage;
-    }
-
     private void onDoneClick() throws IOException
     {
         miscInfo.write("Points Filename: " + pointsText.getText());
