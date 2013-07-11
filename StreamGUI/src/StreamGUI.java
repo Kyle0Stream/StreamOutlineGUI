@@ -1,4 +1,4 @@
-/* Notes by Forrest (7/1/2013)
+ /* Notes by Forrest (7/1/2013)
  * 
  *  Things to get from the image (e.g. DSCN001.JPG or DSCN001.PNG) itself:  
  *      - image width, image height
@@ -68,7 +68,7 @@ public class StreamGUI extends JFrame
     private ArrayList<Point> yellowPoints;
     private ArrayList<Point> redPoints;
     private ArrayList<Point> magentaOutline;
-    
+     
     private File myfile;
     
     private JFileChooser chooser = new JFileChooser();
@@ -143,7 +143,7 @@ public class StreamGUI extends JFrame
                         addSqPtsCtrlPts();
                     } catch (IOException ex) 
                     {
-                        System.out.println("IO Error");
+                        System.out.println(ex);
                     }
                 }
             }
@@ -174,7 +174,7 @@ public class StreamGUI extends JFrame
                         addOutline();
                     } catch (IOException ex) 
                     {
-                        System.out.println("IO Error");
+                        System.out.println(ex);
                     }
                 }
             }
@@ -399,7 +399,6 @@ public class StreamGUI extends JFrame
         miscInfo.newLine();
         miscInfo.write("Outline Filename: " + outlineText.getText());
         miscInfo.newLine();
-        miscInfo.newLine();
         miscInfo.write("Image Height, Width: " + outlineImage.getHeight() + ", " 
                 + outlineImage.getWidth());
         miscInfo.newLine();
@@ -426,6 +425,7 @@ public class StreamGUI extends JFrame
             outline.newLine();
             magentaOutlineCount++;
         }
+        
         miscInfo.close();
         controlPoints.close();
         squareCorners.close();
