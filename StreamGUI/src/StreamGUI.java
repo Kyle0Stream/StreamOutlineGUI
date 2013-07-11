@@ -39,7 +39,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -55,6 +54,10 @@ import streamoutlining.ImageUtils;
 
 public class StreamGUI extends JFrame
 {
+    private BufferedWriter miscInfo;
+    private BufferedWriter outline;
+    private BufferedWriter controlPoints;
+    private BufferedWriter squareCorners;
     private BufferedImage pointsImage;
     private BufferedImage outlineImage;
     private final int SIDE_LENGTH = 8;
@@ -64,10 +67,10 @@ public class StreamGUI extends JFrame
     private int yellowPointsCount = 1;
     private int magentaOutlineCount = 1;
     
-    private ArrayList<Point> yellowPoints;
-    private ArrayList<Point> redPoints;
-    private ArrayList<Point> magentaOutline;
-     
+    private ArrayList<Point>yellowPoints;
+    private ArrayList<Point>redPoints;
+    private ArrayList<Point>magentaOutline;
+    
     private File myfile;
     
     private JFileChooser chooser = new JFileChooser();
@@ -116,6 +119,12 @@ public class StreamGUI extends JFrame
     
     public StreamGUI() throws IOException
     {
+        miscInfo = new BufferedWriter(new FileWriter("E:/miscInfo.txt"));
+        outline = new BufferedWriter(new FileWriter("E:/outline(MAGENTA).txt"));
+        controlPoints = new BufferedWriter(new FileWriter("E:/controlPoints(RED).txt"));
+        squareCorners = new BufferedWriter(new FileWriter("E:/squareCorners(YELLOW).txt"));
+        
+
         bottom = new JPanel();
 
         //CREATES TEXT FIELD AND LABEL for POINTS BROWSE
@@ -309,9 +318,9 @@ public class StreamGUI extends JFrame
                         int BX = (event.getX());
                         int BY = (event.getY());
                         Point pB = new Point(BX,BY);
-                        Point closestA = ImageUtils.getNearestPointFromList(pB, yellowPoints);
-                        String strBX = String.valueOf(closestA.x);
-                        String strBY = String.valueOf(closestA.y);
+                        Point closestB = ImageUtils.getNearestPointFromList(pB, yellowPoints);
+                        String strBX = String.valueOf(closestB.x);
+                        String strBY = String.valueOf(closestB.y);
                         cornerBXText.setText(strBX);
                         cornerBYText.setText(strBY);
                     }
@@ -320,9 +329,9 @@ public class StreamGUI extends JFrame
                         int CX = (event.getX());
                         int CY = (event.getY());
                         Point pC = new Point(CX,CY);
-                        Point closestA = ImageUtils.getNearestPointFromList(pC, yellowPoints);
-                        String strCX = String.valueOf(closestA.x);
-                        String strCY = String.valueOf(closestA.y);
+                        Point closestC = ImageUtils.getNearestPointFromList(pC, yellowPoints);
+                        String strCX = String.valueOf(closestC.x);
+                        String strCY = String.valueOf(closestC.y);
                         cornerCXText.setText(strCX);
                         cornerCYText.setText(strCY);
                     }
@@ -331,9 +340,9 @@ public class StreamGUI extends JFrame
                         int DX = (event.getX());
                         int DY = (event.getY());
                         Point pD = new Point(DX,DY);
-                        Point closestA = ImageUtils.getNearestPointFromList(pD, yellowPoints);
-                        String strDX = String.valueOf(closestA.x);
-                        String strDY = String.valueOf(closestA.y);
+                        Point closestD = ImageUtils.getNearestPointFromList(pD, yellowPoints);
+                        String strDX = String.valueOf(closestD.x);
+                        String strDY = String.valueOf(closestD.y);
                         cornerDXText.setText(strDX);
                         cornerDYText.setText(strDY);
                     }
@@ -367,12 +376,6 @@ public class StreamGUI extends JFrame
     
     private void onDoneClick() throws IOException
     {
-        BufferedWriter miscInfo = new BufferedWriter(new FileWriter("E:/miscInfo.txt"));
-        BufferedWriter outline = new BufferedWriter(new FileWriter("E:/outline.txt"));
-        BufferedWriter controlPoints = new BufferedWriter(new FileWriter("E:/controlPoints.txt"));
-        BufferedWriter squareCorners = new BufferedWriter(new FileWriter("E:/squareCorners.txt"));
-        PrintWriter pw = new PrintWriter(miscInfo);
-        
         miscInfo.write("Points Filename: " + pointsText.getText());
         miscInfo.newLine();
         miscInfo.write("Image Height, Width: " + pointsImage.getHeight() + ", " 
