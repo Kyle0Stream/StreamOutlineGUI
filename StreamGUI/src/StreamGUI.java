@@ -303,7 +303,6 @@ public class StreamGUI extends JFrame
             {
                     if(clickCount==0)
                     {
-                        
                         int AX = (event.getX());
                         int AY = (event.getY());
                         Point pA = new Point(AX,AY);
