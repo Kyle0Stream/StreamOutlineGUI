@@ -1,4 +1,4 @@
-/* Notes by Forrest (7/1/2013)
+ /* Notes by Forrest (7/1/2013)
  * 
  *  Things to get from the image (e.g. DSCN001.JPG or DSCN001.PNG) itself:  
  *      - image width, image height
@@ -121,9 +121,9 @@ public class StreamGUI extends JFrame
     public StreamGUI() throws IOException
     {
         miscInfo = new BufferedWriter(new FileWriter("E:/miscInfo.txt"));
-        outline = new BufferedWriter(new FileWriter("E:/outline.txt"));
-        controlPoints = new BufferedWriter(new FileWriter("E:/controlPoints.txt"));
-        squareCorners = new BufferedWriter(new FileWriter("E:/squareCorners.txt"));
+        outline = new BufferedWriter(new FileWriter("E:/outline(MAGENTA).txt"));
+        controlPoints = new BufferedWriter(new FileWriter("E:/controlPoints(RED).txt"));
+        squareCorners = new BufferedWriter(new FileWriter("E:/squareCorners(YELLOW).txt"));
         
 
         bottom = new JPanel();
@@ -152,7 +152,7 @@ public class StreamGUI extends JFrame
                         addSqPtsCtrlPts();
                     } catch (IOException ex) 
                     {
-                        System.out.println("IO Error");
+                        System.out.println(ex);
                     }
                 }
             }
@@ -183,7 +183,7 @@ public class StreamGUI extends JFrame
                         addOutline();
                     } catch (IOException ex) 
                     {
-                        System.out.println("IO Error");
+                        System.out.println(ex);
                     }
                 }
             }
@@ -402,7 +402,6 @@ public class StreamGUI extends JFrame
         miscInfo.newLine();
         miscInfo.write("Outline Filename: " + outlineText.getText());
         miscInfo.newLine();
-        miscInfo.newLine();
         miscInfo.write("Image Height, Width: " + outlineImage.getHeight() + ", " 
                 + outlineImage.getWidth());
         miscInfo.newLine();
@@ -429,6 +428,7 @@ public class StreamGUI extends JFrame
             outline.newLine();
             magentaOutlineCount++;
         }
+        
         miscInfo.close();
         controlPoints.close();
         squareCorners.close();
