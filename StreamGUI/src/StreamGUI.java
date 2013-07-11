@@ -39,6 +39,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -54,10 +55,6 @@ import streamoutlining.ImageUtils;
 
 public class StreamGUI extends JFrame
 {
-    private BufferedWriter miscInfo;
-    private BufferedWriter outline;
-    private BufferedWriter controlPoints;
-    private BufferedWriter squareCorners;
     private BufferedImage pointsImage;
     private BufferedImage outlineImage;
 //    private BufferedImage resize;
@@ -68,9 +65,9 @@ public class StreamGUI extends JFrame
     private int yellowPointsCount = 1;
     private int magentaOutlineCount = 1;
     
-    private ArrayList<Point>yellowPoints;
-    private ArrayList<Point>redPoints;
-    private ArrayList<Point>magentaOutline;
+    private ArrayList<Point> yellowPoints;
+    private ArrayList<Point> redPoints;
+    private ArrayList<Point> magentaOutline;
     
     private File myfile;
     
@@ -120,12 +117,6 @@ public class StreamGUI extends JFrame
     
     public StreamGUI() throws IOException
     {
-        miscInfo = new BufferedWriter(new FileWriter("E:/miscInfo.txt"));
-        outline = new BufferedWriter(new FileWriter("E:/outline.txt"));
-        controlPoints = new BufferedWriter(new FileWriter("E:/controlPoints.txt"));
-        squareCorners = new BufferedWriter(new FileWriter("E:/squareCorners.txt"));
-        
-
         bottom = new JPanel();
 
         //CREATES TEXT FIELD AND LABEL for POINTS BROWSE
@@ -379,6 +370,12 @@ public class StreamGUI extends JFrame
 
     private void onDoneClick() throws IOException
     {
+        BufferedWriter miscInfo = new BufferedWriter(new FileWriter("E:/miscInfo.txt"));
+        BufferedWriter outline = new BufferedWriter(new FileWriter("E:/outline.txt"));
+        BufferedWriter controlPoints = new BufferedWriter(new FileWriter("E:/controlPoints.txt"));
+        BufferedWriter squareCorners = new BufferedWriter(new FileWriter("E:/squareCorners.txt"));
+        PrintWriter pw = new PrintWriter(miscInfo);
+        
         miscInfo.write("Points Filename: " + pointsText.getText());
         miscInfo.newLine();
         miscInfo.write("Image Height, Width: " + pointsImage.getHeight() + ", " 
