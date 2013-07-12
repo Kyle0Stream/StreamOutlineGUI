@@ -108,6 +108,37 @@ public class ImageUtils {
         return pixelList;
     }
 
+        public static ArrayList<ImageMarker> extractColoredMarkers(BufferedImage img) {
+            ArrayList<ImageMarker> markerList = new ArrayList<ImageMarker>();
+
+            for (int y = 0; y < img.getHeight(); y++) {
+                for (int x = 0; x < img.getWidth(); x++) {
+                    // IMPORTANT NOTE: 
+                    // the second argument needs to be true so we read in the ALPHA transparency
+                    // of the pixel -- otherwise we can pick up false positives of pixels that
+                    // used to be the certain color, but then were transparent
+                    Color pixelColor = new Color(img.getRGB(x, y), true);
+                    // check if the pixel color (and alpha) matches
+                    if (pixelColor.equals(Color.yellow)) {
+                        markerList.add(new ImageMarker(ImageMarker.MarkerType.CORNER_POINT, new Point(x, y)));
+                    }
+                    else if (pixelColor.equals(Color.red)) {
+                        markerList.add(new ImageMarker(ImageMarker.MarkerType.CONTROL_POINT, new Point(x, y)));
+                    }
+                    else if (pixelColor.equals(Color.magenta)) {
+                        markerList.add(new ImageMarker(ImageMarker.MarkerType.OUTLINE_POINT, new Point(x, y)));                        
+                    }
+                    else if (pixelColor.getAlpha() > 0)
+                    {
+                        // we found an incorrectly colored non-transparent pixel, sound error!
+                        throw new RuntimeException("Image contained non-transparent pixel of invalid color: " + pixelColor);
+                    }
+                }
+            }
+        return markerList;
+    }
+
+    
     /**
      * Modifies the given image by expanding each pixel of a certain color by
      * drawing a circle of a larger radius on top of it.
