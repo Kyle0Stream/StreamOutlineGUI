@@ -1,10 +1,9 @@
-package streamoutlining;
-
 /**
  *
  * @author Kyle Lusk
  */
 
+package streamoutlining;
 import java.awt.Point;
 
 public class ControlPoint 
