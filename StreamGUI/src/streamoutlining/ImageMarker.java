@@ -37,6 +37,11 @@ public class ImageMarker
         this.id = id;
     }
     
+    public MarkerType getType()
+    {
+        return this.type;
+    }
+    
     @Override
     public String toString()
     {

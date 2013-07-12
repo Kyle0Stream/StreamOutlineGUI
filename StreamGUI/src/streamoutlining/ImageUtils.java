@@ -24,24 +24,24 @@ public class ImageUtils {
 
     /**
      * @param p - the point that we're measuring all the distances from
-     * @param listOfPoints - a list of points to check the distance from point P
+     * @param listOfMarkers - a list of points to check the distance from point P
      * @return the Point in the list that was closest to p.
      */
-    public static Point getNearestPointFromList(Point p, List<Point> listOfPoints)
+    public static ImageMarker getNearestMarkerFromList(Point p, List<ImageMarker> listOfMarkers)
     {
         double shortestDistanceSoFar = Double.MAX_VALUE;
-        Point nearestPoint = null;
+        ImageMarker nearestMarker = null;        
         
-        for (Point p2 : listOfPoints)
+        for (ImageMarker marker : listOfMarkers)
         {
-            double distToThisPoint = p.distance(p2);
+            double distToThisPoint = p.distance(marker.getLocation());
             if (distToThisPoint < shortestDistanceSoFar)
             {
                 shortestDistanceSoFar = distToThisPoint;
-                nearestPoint = p2;
+                nearestMarker = marker;
             }
         }
-        return nearestPoint;
+        return nearestMarker;
     }
     
     /**

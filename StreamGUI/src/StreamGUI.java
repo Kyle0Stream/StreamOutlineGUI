@@ -25,9 +25,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import streamoutlining.ImageMarker;
 import streamoutlining.ImageUtils;
-import streamoutlining.ControlPoint;
-import streamoutlining.SquareCorner;
 
 public class StreamGUI extends JFrame
 {
@@ -39,14 +38,11 @@ public class StreamGUI extends JFrame
     private BufferedImage outlineImage;
     private final int SIDE_LENGTH = 8;
     private final int fieldWidth = 15;
-    private int clickCount = 0;
-    private int redPointsCount = 1;
-    private int yellowPointsCount = 1;
+
     private int magentaOutlineCount = 1;
     
-    private ArrayList<Point>yellowPoints;
-    private ArrayList<Point>redPoints;
-    private ArrayList<Point>magentaOutline;
+    private ArrayList<ImageMarker> cornerAndControlMarkers;
+    private ArrayList<ImageMarker> outlineMarkers;
     
     private File myfile;
     
@@ -123,9 +119,8 @@ public class StreamGUI extends JFrame
                         pointsImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
                         pointsText.setText(myfile.getName());
-                        yellowPoints = ImageUtils.getPixelListForColor(pointsImage, Color.yellow);
-                        redPoints = ImageUtils.getPixelListForColor(pointsImage, Color.red);
-                        addSqPtsCtrlPts();
+                        cornerAndControlMarkers = ImageUtils.extractColoredMarkers(pointsImage);
+                        setupImageDisplayWindow();
                     } catch (IOException ex) 
                     {
                         System.out.println(ex);
@@ -155,7 +150,7 @@ public class StreamGUI extends JFrame
                         outlineImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
                         outlineText.setText(myfile.getName());
-                        magentaOutline = ImageUtils.getPixelListForColor(outlineImage, Color.magenta);
+                        outlineMarkers = ImageUtils.extractColoredMarkers(outlineImage);
                         addOutline();
                     } catch (IOException ex) 
                     {
@@ -269,7 +264,7 @@ public class StreamGUI extends JFrame
         frameOutline.setVisible(true);
     }
         
-    private void addSqPtsCtrlPts()
+    private void setupImageDisplayWindow()
     {
         pictureLabel = new JLabel(new ImageIcon(pointsImage));
         framePoints = new JFrame();
@@ -278,44 +273,41 @@ public class StreamGUI extends JFrame
             @Override
             public void mousePressed(MouseEvent event) 
             {
-                String inputValue = JOptionPane.showInputDialog("Please enter either:"
-                        + " (control, or corner).");
-                if (inputValue.equals("control"))
+                Point p = (event.getPoint());
+                ImageMarker mClosest = ImageUtils.getNearestMarkerFromList(p, cornerAndControlMarkers);
+
+                if (mClosest.getType() == ImageMarker.MarkerType.CONTROL_POINT)
                 {
-                    String controlName = JOptionPane.showInputDialog("Please enter "
+                    String controlID = JOptionPane.showInputDialog("Please enter "
                             + "the control point number.");
-                    int i = Integer.parseInt(controlName);
-                    Point p = (event.getPoint());
-                    Point pClosest = ImageUtils.getNearestPointFromList(p, redPoints);
-                    ControlPoint cp = new ControlPoint(i, pClosest);
-                    //NEED TO FIGURE OUT WHAT TO DO / HOW TO ADD cp
-                }else if(inputValue.equals("corner"))
+                    //int i = Integer.parseInt(controlName);
+                    mClosest.setID(controlID);
+                    
+                    
+                }else if(mClosest.getType() == ImageMarker.MarkerType.CORNER_POINT)
                 {
                     String cornerLetter = JOptionPane.showInputDialog("Please enter"
                             + " the letter of the corner.");
-                    Point p = (event.getPoint());
-                    Point pClosest = ImageUtils.getNearestPointFromList(p, yellowPoints);
-                    SquareCorner sq = new SquareCorner(cornerLetter, pClosest);
-                    //NEED TO FIGURE OUT WHAT TO DO / HOW TO ADD sq
+                    mClosest.setID(cornerLetter);
                     if(cornerLetter.equalsIgnoreCase("a"))
                     {
-                        cornerAXText.setText(String.valueOf(pClosest.x));
-                        cornerAYText.setText(String.valueOf(pClosest.y));
+                        cornerAXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
+                        cornerAYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                     }
                     if(cornerLetter.equalsIgnoreCase("b"))
                     {
-                        cornerBXText.setText(String.valueOf(pClosest.x));
-                        cornerBYText.setText(String.valueOf(pClosest.y));
+                        cornerBXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
+                        cornerBYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                     }
                     if(cornerLetter.equalsIgnoreCase("c"))
                     {
-                        cornerCXText.setText(String.valueOf(pClosest.x));
-                        cornerCYText.setText(String.valueOf(pClosest.y));
+                        cornerCXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
+                        cornerCYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                     }
                     if(cornerLetter.equalsIgnoreCase("d"))
                     {
-                        cornerDXText.setText(String.valueOf(pClosest.x));
-                        cornerDYText.setText(String.valueOf(pClosest.y));
+                        cornerDXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
+                        cornerDYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                     }   
                 }
             }
@@ -375,28 +367,32 @@ public class StreamGUI extends JFrame
         miscInfo.newLine();
         
         //PIXEL LOCATIONS HERE (RED, YELLOW)
-        for (Point p: redPoints)
+        for (ImageMarker marker: cornerAndControlMarkers)
         {
-            controlPoints.write(p.x + ", " + p.y);
-            controlPoints.newLine();
-            redPointsCount++;
+            if(marker.getType() == ImageMarker.MarkerType.CONTROL_POINT)
+            {
+                controlPoints.write(marker.getID() + ", " + marker.getLocation().x 
+                        + ", " + marker.getLocation().y);
+                controlPoints.newLine();
+            }
+            if(marker.getType() == ImageMarker.MarkerType.CORNER_POINT)
+            {
+                squareCorners.write(marker.getID() + ", " + marker.getLocation().x 
+                        + ", " + marker.getLocation().y);
+                squareCorners.newLine();
+            }
         }
         
-        for (Point p: yellowPoints)
-        {
-            squareCorners.write(p.x + ", " + p.y);
-            squareCorners.newLine();
-            yellowPointsCount++;
-        }
-
         //PIXEL LOCATIONS HERE (MAGENTA)
-        for (Point p: magentaOutline)
+        for (ImageMarker marker: cornerAndControlMarkers)
         {
-            outline.write(p.x + ", " + p.y);
-            outline.newLine();
-            magentaOutlineCount++;
+            if(marker.getType() == ImageMarker.MarkerType.OUTLINE_POINT)
+            {
+                outline.write(marker.getID() + ", " + marker.getLocation().x 
+                        + ", " + marker.getLocation().y);
+                outline.newLine();
+            }
         }
-        
         miscInfo.close();
         controlPoints.close();
         squareCorners.close();
