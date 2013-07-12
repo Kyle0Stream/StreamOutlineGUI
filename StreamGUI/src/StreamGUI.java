@@ -297,25 +297,25 @@ public class StreamGUI extends JFrame
                     Point pClosest = ImageUtils.getNearestPointFromList(p, yellowPoints);
                     SquareCorner sq = new SquareCorner(cornerLetter, pClosest);
                     //NEED TO FIGURE OUT WHAT TO DO / HOW TO ADD sq
-                    if(cornerLetter.equalsIgnoreCase("a"));
+                    if(cornerLetter.equalsIgnoreCase("a"))
                     {
                         cornerAXText.setText(String.valueOf(pClosest.x));
-                        cornerAXText.setText(String.valueOf(pClosest.y));
+                        cornerAYText.setText(String.valueOf(pClosest.y));
                     }
-                    if(cornerLetter.equalsIgnoreCase("b"));
+                    if(cornerLetter.equalsIgnoreCase("b"))
                     {
                         cornerBXText.setText(String.valueOf(pClosest.x));
-                        cornerBXText.setText(String.valueOf(pClosest.y));
+                        cornerBYText.setText(String.valueOf(pClosest.y));
                     }
-                    if(cornerLetter.equalsIgnoreCase("c"));
+                    if(cornerLetter.equalsIgnoreCase("c"))
                     {
                         cornerCXText.setText(String.valueOf(pClosest.x));
-                        cornerCXText.setText(String.valueOf(pClosest.y));
+                        cornerCYText.setText(String.valueOf(pClosest.y));
                     }
-                    if(cornerLetter.equalsIgnoreCase("d"));
+                    if(cornerLetter.equalsIgnoreCase("d"))
                     {
                         cornerDXText.setText(String.valueOf(pClosest.x));
-                        cornerDXText.setText(String.valueOf(pClosest.y));
+                        cornerDYText.setText(String.valueOf(pClosest.y));
                     }   
                 }
             }
