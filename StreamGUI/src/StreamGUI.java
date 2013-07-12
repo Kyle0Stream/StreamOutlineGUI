@@ -4,6 +4,7 @@
  */
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -30,23 +32,23 @@ import streamoutlining.ImageUtils;
 
 public class StreamGUI extends JFrame
 {
-    private BufferedWriter miscInfo;
-    private BufferedWriter outline;
-    private BufferedWriter controlPoints;
-    private BufferedWriter squareCorners;
+    final double SCALE_FACTOR = 4.0;
+    
+    private BufferedImage JPEGImage;
     private BufferedImage pointsImage;
     private BufferedImage outlineImage;
+    BufferedImage allThreeShrunk;
+    
     private final int SIDE_LENGTH = 8;
     private final int fieldWidth = 15;
-
-    private int magentaOutlineCount = 1;
+    private String JPEGFileName;
     
     private ArrayList<ImageMarker> cornerAndControlMarkers;
     private ArrayList<ImageMarker> outlineMarkers;
     
     private File myfile;
     
-    private JFileChooser chooser = new JFileChooser();
+    private JFileChooser chooser;
     
     private JFrame framePoints;
     private JFrame frameOutline;
@@ -54,13 +56,10 @@ public class StreamGUI extends JFrame
     
     private JLabel pictureLabel;
     
-    private JLabel pointsLabel;
-    private JTextField pointsText;
-    private JButton pointsBrowse;
+    private JLabel JPGLabel;
+    private JTextField JPEGText;
+    private JButton JPEGBrowse;
     
-    private JLabel outlineLabel;
-    private JTextField outlineText;
-    private JButton outlineBrowse;
    
     private JLabel cornerAXLabel;
     private JTextField cornerAXText;
@@ -92,20 +91,16 @@ public class StreamGUI extends JFrame
     
     public StreamGUI() throws IOException
     {
-        miscInfo = new BufferedWriter(new FileWriter("E:/miscInfo.txt"));
-        outline = new BufferedWriter(new FileWriter("E:/outline(MAGENTA).txt"));
-        controlPoints = new BufferedWriter(new FileWriter("E:/controlPoints(RED).txt"));
-        squareCorners = new BufferedWriter(new FileWriter("E:/squareCorners(YELLOW).txt"));
-        
-
         bottom = new JPanel();
 
+         chooser = new JFileChooser();
+         chooser.setCurrentDirectory(new File("."));
         //CREATES TEXT FIELD AND LABEL for POINTS BROWSE
-        pointsLabel = new JLabel("Points: ");
-        pointsText = new JTextField(fieldWidth);
+        JPGLabel = new JLabel("JPG File: ");
+        JPEGText = new JTextField(fieldWidth);
         
         //CREATES BROWSE BUTTON
-        pointsBrowse = new JButton("Browse");
+        JPEGBrowse = new JButton("Browse");
         
         class pointsBrowseListener implements ActionListener
         {
@@ -116,11 +111,23 @@ public class StreamGUI extends JFrame
                 {
                     try 
                     {
-                        pointsImage = ImageIO.read(chooser.getSelectedFile());
+                        JPEGImage = ImageIO.read(chooser.getSelectedFile());
                         myfile = chooser.getSelectedFile();
-                        pointsText.setText(myfile.getName());
+                        JPEGFileName = myfile.getPath();
+                        String PNGOutlineFileName = JPEGFileName.replace(".JPG", "outline.png");
+                        String PNGPointsFileName = JPEGFileName.replace(".JPG", "points.png");
+                        
+                        File outline = new File(PNGOutlineFileName);
+                        File points = new File(PNGPointsFileName);
+                        
+                        JPEGText.setText(myfile.getName());
+                        pointsImage = ImageIO.read(points);
+                        outlineImage = ImageIO.read(outline);
+                        
                         cornerAndControlMarkers = ImageUtils.extractColoredMarkers(pointsImage);
+                        outlineMarkers = ImageUtils.extractColoredMarkers(outlineImage);
                         setupImageDisplayWindow();
+                        
                     } catch (IOException ex) 
                     {
                         System.out.println(ex);
@@ -129,38 +136,7 @@ public class StreamGUI extends JFrame
             }
         }
         ActionListener fileName = new pointsBrowseListener();
-        pointsBrowse.addActionListener(fileName);
-        
-        //CREATES TEXT FIELD AND LABEL for OUTLINE BROWSE 
-        outlineLabel = new JLabel("Outline: ");
-        outlineText = new JTextField(fieldWidth);
-        
-        //CREATES BROWSE BUTTON
-        outlineBrowse = new JButton("Browse");
-        
-        class outlineBrowseListener implements ActionListener
-        {
-            @Override
-            public void actionPerformed(ActionEvent event)
-            {
-                if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
-                {
-                    try 
-                    {
-                        outlineImage = ImageIO.read(chooser.getSelectedFile());
-                        myfile = chooser.getSelectedFile();
-                        outlineText.setText(myfile.getName());
-                        outlineMarkers = ImageUtils.extractColoredMarkers(outlineImage);
-                        addOutline();
-                    } catch (IOException ex) 
-                    {
-                        System.out.println(ex);
-                    }
-                }
-            }
-        }
-        ActionListener fileName1 = new outlineBrowseListener();
-        outlineBrowse.addActionListener(fileName1);
+        JPEGBrowse.addActionListener(fileName);
         
         //CREATES TEXT FIELDS AND LABELS FOR CORNER A-D, SIDELENGTH, AND HFOV
         cornerAXLabel = new JLabel("Corner A (X): ");
@@ -216,12 +192,9 @@ public class StreamGUI extends JFrame
         done.addActionListener(doneButton);
 
         //CREATES PANEL
-        bottom.add(pointsLabel);
-        bottom.add(pointsText);
-        bottom.add(pointsBrowse);
-        bottom.add(outlineLabel);
-        bottom.add(outlineText);
-        bottom.add(outlineBrowse);
+        bottom.add(JPGLabel);
+        bottom.add(JPEGText);
+        bottom.add(JPEGBrowse);
         bottom.add(cornerAXLabel);
         bottom.add(cornerAXText);
         bottom.add(cornerAYLabel);
@@ -245,71 +218,72 @@ public class StreamGUI extends JFrame
         bottom.add(done);
         this.add(bottom);
     }
-    
-    private void addOutline()
-    {
-        pictureLabel = new JLabel(new ImageIcon(outlineImage));
-        frameOutline = new JFrame();
-        frameOutline.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frameOutline.getContentPane().add(pictureLabel);
-        frameOutline.pack();
-        JScrollPane scrollBar=new JScrollPane(pictureLabel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        frameOutline.add(scrollBar);
-        pictureLabel.setBackground(Color.black);
-        pictureLabel.setOpaque(true);
-        frameOutline.setTitle("Stream Outline");
-        frameOutline.setLocation(350,0);
-        frameOutline.setSize(900,700);
-        frameOutline.setVisible(true);
-    }
         
     private void setupImageDisplayWindow()
     {
-        pictureLabel = new JLabel(new ImageIcon(pointsImage));
+        BufferedImage points = ImageUtils.overlay(pointsImage, outlineImage);
+        BufferedImage allThree = ImageUtils.overlay(points, JPEGImage);
+        allThreeShrunk = ImageUtils.makeShrunkImageCopy(allThree, SCALE_FACTOR);
+        ImageUtils.enlargePoints(allThreeShrunk, cornerAndControlMarkers, 3, SCALE_FACTOR);
+        ImageUtils.enlargePoints(allThreeShrunk, outlineMarkers, 0, SCALE_FACTOR);
+        pictureLabel = new JLabel(new ImageIcon(allThreeShrunk));
         framePoints = new JFrame();
         MouseListener listener = new MouseListener() 
         { 
             @Override
             public void mousePressed(MouseEvent event) 
             {
-                Point p = (event.getPoint());
-                ImageMarker mClosest = ImageUtils.getNearestMarkerFromList(p, cornerAndControlMarkers);
-
+                Point pWindow = (event.getPoint());
+                Point pInOriginalImage = new Point((int)(pWindow.x*SCALE_FACTOR),(int)(pWindow.y*SCALE_FACTOR));
+                ImageMarker mClosest = ImageUtils.getNearestMarkerFromList(pInOriginalImage, cornerAndControlMarkers);
+                String markerID="";
                 if (mClosest.getType() == ImageMarker.MarkerType.CONTROL_POINT)
                 {
-                    String controlID = JOptionPane.showInputDialog("Please enter "
+                    markerID = JOptionPane.showInputDialog("Please enter "
                             + "the control point number.");
-                    //int i = Integer.parseInt(controlName);
-                    mClosest.setID(controlID);
-                    
+                    mClosest.setID(markerID);
                     
                 }else if(mClosest.getType() == ImageMarker.MarkerType.CORNER_POINT)
                 {
-                    String cornerLetter = JOptionPane.showInputDialog("Please enter"
+                    markerID = JOptionPane.showInputDialog("Please enter"
                             + " the letter of the corner.");
-                    mClosest.setID(cornerLetter);
-                    if(cornerLetter.equalsIgnoreCase("a"))
+                    mClosest.setID(markerID);
+                    if(markerID.equalsIgnoreCase("a"))
                     {
                         cornerAXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
                         cornerAYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                     }
-                    if(cornerLetter.equalsIgnoreCase("b"))
+                    if(markerID.equalsIgnoreCase("b"))
                     {
                         cornerBXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
                         cornerBYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                     }
-                    if(cornerLetter.equalsIgnoreCase("c"))
+                    if(markerID.equalsIgnoreCase("c"))
                     {
                         cornerCXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
                         cornerCYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                     }
-                    if(cornerLetter.equalsIgnoreCase("d"))
+                    if(markerID.equalsIgnoreCase("d"))
                     {
                         cornerDXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
                         cornerDYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                     }   
                 }
+                Graphics2D g = allThreeShrunk.createGraphics();
+                g.setColor(Color.GRAY);
+                int centerx = (int)(mClosest.getLocation().x/SCALE_FACTOR);
+                int centery = (int)(mClosest.getLocation().y/SCALE_FACTOR);
+                g.fillOval(centerx-2,centery-2,5,5);
+                g.setColor(Color.BLACK);
+                g.drawString(markerID, centerx+4,centery+4);
+                g.drawString(markerID, centerx+6,centery+4);
+                g.drawString(markerID, centerx+4,centery+6);
+                g.drawString(markerID, centerx+6,centery+6);
+                g.setColor(Color.WHITE);
+                g.drawString(markerID, centerx+5,centery+5);
+                g.dispose();
+                pictureLabel.repaint();                   
+                
             }
             @Override
             public void mouseClicked(MouseEvent event) {}
@@ -329,8 +303,6 @@ public class StreamGUI extends JFrame
         JScrollPane scrollBar=new JScrollPane(pictureLabel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         framePoints.add(scrollBar);
-        JOptionPane.showMessageDialog(framePoints, "Click on the four corners of the "
-                + "same square to fill in points A-D.", "Information", JOptionPane.INFORMATION_MESSAGE);
         framePoints.setTitle("Square Points and Control Points");
         framePoints.setLocation(350,0);
         framePoints.setSize(900,700);
@@ -339,58 +311,50 @@ public class StreamGUI extends JFrame
     
     private void onDoneClick() throws IOException
     {
-        miscInfo.write("Points Filename: " + pointsText.getText());
-        miscInfo.newLine();
-        miscInfo.write("Image Height, Width: " + pointsImage.getHeight() + ", " 
+        PrintWriter miscInfo = new PrintWriter(new FileWriter("E:/miscInfo.txt"));
+        PrintWriter outline = new PrintWriter(new FileWriter("E:/outline(MAGENTA).txt"));
+        PrintWriter controlPoints = new PrintWriter(new FileWriter("E:/controlPoints(RED).txt"));
+        PrintWriter squareCorners = new PrintWriter(new FileWriter("E:/squareCorners(YELLOW).txt"));
+
+        miscInfo.println("JPG Filename: " + JPEGText.getText());
+
+        miscInfo.println("Image Height, Width: " + pointsImage.getHeight() + ", " 
                 + pointsImage.getWidth());
-        miscInfo.newLine();
-        miscInfo.write("CornerA (X,Y): " + Double.parseDouble(cornerAXText.getText())
+        miscInfo.println("CornerA (X,Y): " + Double.parseDouble(cornerAXText.getText())
                 + ", " + Double.parseDouble(cornerAYText.getText()));
-        miscInfo.newLine();
-        miscInfo.write("CornerB (X,Y): " + Double.parseDouble(cornerBXText.getText())
+        miscInfo.println("CornerB (X,Y): " + Double.parseDouble(cornerBXText.getText())
                 + ", " + Double.parseDouble(cornerBYText.getText()));
-        miscInfo.newLine();
-        miscInfo.write("CornerC (X,Y): " + Double.parseDouble(cornerCXText.getText())
+        miscInfo.println("CornerC (X,Y): " + Double.parseDouble(cornerCXText.getText())
                 + ", " + Double.parseDouble(cornerCYText.getText()));
-        miscInfo.newLine();
-        miscInfo.write("CornerD (X,Y): " + Double.parseDouble(cornerDXText.getText())
+        miscInfo.println("CornerD (X,Y): " + Double.parseDouble(cornerDXText.getText())
                 + ", " + Double.parseDouble(cornerDYText.getText()));
-        miscInfo.newLine();
-        miscInfo.write("Square Side Length: " + Double.parseDouble(sideLengthText.getText()));
-        miscInfo.newLine();
-        miscInfo.write("HFOV: " + Double.parseDouble(hfovText.getText()));
-        miscInfo.newLine();
-        miscInfo.write("Outline Filename: " + outlineText.getText());
-        miscInfo.newLine();
-        miscInfo.write("Image Height, Width: " + outlineImage.getHeight() + ", " 
-                + outlineImage.getWidth());
-        miscInfo.newLine();
-        
+        miscInfo.println("Square Side Length: " + Double.parseDouble(sideLengthText.getText()));
+        miscInfo.println("HFOV: " + Double.parseDouble(hfovText.getText()));
+//        miscInfo.println("Outline Filename: " + outlineText.getText());
+//        miscInfo.println("Image Height, Width: " + outlineImage.getHeight() + ", " 
+//                + outlineImage.getWidth());
+//        
         //PIXEL LOCATIONS HERE (RED, YELLOW)
         for (ImageMarker marker: cornerAndControlMarkers)
         {
             if(marker.getType() == ImageMarker.MarkerType.CONTROL_POINT)
             {
-                controlPoints.write(marker.getID() + ", " + marker.getLocation().x 
+                controlPoints.println(marker.getID() + ", " + marker.getLocation().x 
                         + ", " + marker.getLocation().y);
-                controlPoints.newLine();
             }
             if(marker.getType() == ImageMarker.MarkerType.CORNER_POINT)
             {
-                squareCorners.write(marker.getID() + ", " + marker.getLocation().x 
+                squareCorners.println(marker.getID() + ", " + marker.getLocation().x 
                         + ", " + marker.getLocation().y);
-                squareCorners.newLine();
             }
         }
         
         //PIXEL LOCATIONS HERE (MAGENTA)
-        for (ImageMarker marker: cornerAndControlMarkers)
+        for (ImageMarker marker: outlineMarkers)
         {
             if(marker.getType() == ImageMarker.MarkerType.OUTLINE_POINT)
             {
-                outline.write(marker.getID() + ", " + marker.getLocation().x 
-                        + ", " + marker.getLocation().y);
-                outline.newLine();
+                outline.println(marker.getLocation().x + ", " + marker.getLocation().y);
             }
         }
         miscInfo.close();
@@ -406,7 +370,7 @@ public class StreamGUI extends JFrame
     {
         StreamGUI frameStreamGUI = new StreamGUI();
         frameStreamGUI.setTitle("StreamGUI");
-        frameStreamGUI.setSize(350,260);
+        frameStreamGUI.setSize(350,230);
         frameStreamGUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frameStreamGUI.setVisible(true);
     }

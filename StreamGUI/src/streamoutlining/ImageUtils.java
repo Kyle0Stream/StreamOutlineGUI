@@ -128,11 +128,11 @@ public class ImageUtils {
                     else if (pixelColor.equals(Color.magenta)) {
                         markerList.add(new ImageMarker(ImageMarker.MarkerType.OUTLINE_POINT, new Point(x, y)));                        
                     }
-                    else if (pixelColor.getAlpha() > 0)
-                    {
-                        // we found an incorrectly colored non-transparent pixel, sound error!
-                        throw new RuntimeException("Image contained non-transparent pixel of invalid color: " + pixelColor);
-                    }
+//                    else if (pixelColor.getAlpha() > 0)
+//                    {
+//                        // we found an incorrectly colored non-transparent pixel, sound error!
+//                        throw new RuntimeException("Image contained non-transparent pixel of invalid color: " + pixelColor);
+//                    }
                 }
             }
         return markerList;
@@ -148,14 +148,34 @@ public class ImageUtils {
      * @param color - color to use for filling in circles
      * @param enlargeAmount - radius of enlargement.
      */
-    public static void enlargePoints(BufferedImage img, ArrayList<Point> pointList, Color pointColor, int enlargeAmount, double imageScaledFactor) {
+    public static void enlargePoints(BufferedImage img, ArrayList<ImageMarker> markerList, int enlargeAmount, double imageScaledFactor) {
         Graphics g = img.getGraphics();
-        for (Point p : pointList) {
+        for (ImageMarker marker : markerList) {
             //draw a circle at each point, with the radius (enlargeAmount + 1)
-            g.setColor(pointColor);
-            g.fillOval((int) (p.getX() / imageScaledFactor - enlargeAmount), 
-                       (int) (p.getY() / imageScaledFactor - enlargeAmount),
+            if (marker.getType() == ImageMarker.MarkerType.CORNER_POINT)
+            {
+                g.setColor(Color.yellow);
+            }
+            else if (marker.getType() == ImageMarker.MarkerType.CONTROL_POINT)
+            {
+                g.setColor(Color.red);
+            }
+            else if (marker.getType() == ImageMarker.MarkerType.OUTLINE_POINT)
+            {
+                g.setColor(Color.magenta);
+            }
+            if (enlargeAmount == 0)
+            {
+                g.fillRect((int) (marker.getLocation().x / imageScaledFactor), 
+                       (int) (marker.getLocation().y / imageScaledFactor),
+                       1, 1);
+            }
+            else
+            {
+                g.fillOval((int) (marker.getLocation().x / imageScaledFactor - enlargeAmount), 
+                       (int) (marker.getLocation().y / imageScaledFactor - enlargeAmount),
                        2 * enlargeAmount + 1, 2 * enlargeAmount + 1);
+            }
         }
     }
 
@@ -170,9 +190,9 @@ public class ImageUtils {
         BufferedImage combinedImg = overlay(imgPoints, imgOutline);
         BufferedImage combinedScaledImg = makeShrunkImageCopy(combinedImg, 4);
         
-        enlargePoints(combinedScaledImg, outlinePointList, Color.magenta, 1, 4);
-        enlargePoints(combinedScaledImg, controlPointList, Color.red, 3, 4);
-        enlargePoints(combinedScaledImg, squareCornersList, Color.yellow, 3, 4);
+//        enlargePoints(combinedScaledImg, outlinePointList, Color.magenta, 1, 4);
+//        enlargePoints(combinedScaledImg, controlPointList, Color.red, 3, 4);
+//        enlargePoints(combinedScaledImg, squareCornersList, Color.yellow, 3, 4);
 
 
         JLabel pictureLabel = new JLabel(new ImageIcon(combinedScaledImg));
