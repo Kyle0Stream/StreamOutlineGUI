@@ -278,12 +278,12 @@ public class StreamGUI extends JFrame
             @Override
             public void mousePressed(MouseEvent event) 
             {
-                String inputValue = JOptionPane.showInputDialog("Please Enter either:"
+                String inputValue = JOptionPane.showInputDialog("Please enter either:"
                         + " (control, or corner).");
                 if (inputValue.equals("control"))
                 {
-                    String controlName = JOptionPane.showInputDialog("Please Enter "
-                            + "Control Point Number.");
+                    String controlName = JOptionPane.showInputDialog("Please enter "
+                            + "the control point number.");
                     int i = Integer.parseInt(controlName);
                     Point p = (event.getPoint());
                     Point pClosest = ImageUtils.getNearestPointFromList(p, redPoints);
@@ -291,18 +291,38 @@ public class StreamGUI extends JFrame
                     //NEED TO FIGURE OUT WHAT TO DO / HOW TO ADD cp
                 }else if(inputValue.equals("corner"))
                 {
-                    String cornerLetter = JOptionPane.showInputDialog("Please Enter"
-                            + "the letter of the corner.");
+                    String cornerLetter = JOptionPane.showInputDialog("Please enter"
+                            + " the letter of the corner.");
                     Point p = (event.getPoint());
                     Point pClosest = ImageUtils.getNearestPointFromList(p, yellowPoints);
                     SquareCorner sq = new SquareCorner(cornerLetter, pClosest);
                     //NEED TO FIGURE OUT WHAT TO DO / HOW TO ADD sq
+                    if(cornerLetter.equalsIgnoreCase("a"));
+                    {
+                        cornerAXText.setText(String.valueOf(pClosest.x));
+                        cornerAXText.setText(String.valueOf(pClosest.y));
+                    }
+                    if(cornerLetter.equalsIgnoreCase("b"));
+                    {
+                        cornerBXText.setText(String.valueOf(pClosest.x));
+                        cornerBXText.setText(String.valueOf(pClosest.y));
+                    }
+                    if(cornerLetter.equalsIgnoreCase("c"));
+                    {
+                        cornerCXText.setText(String.valueOf(pClosest.x));
+                        cornerCXText.setText(String.valueOf(pClosest.y));
+                    }
+                    if(cornerLetter.equalsIgnoreCase("d"));
+                    {
+                        cornerDXText.setText(String.valueOf(pClosest.x));
+                        cornerDXText.setText(String.valueOf(pClosest.y));
+                    }   
                 }
             }
             @Override
-            public void mouseReleased(MouseEvent event) {}
-            @Override
             public void mouseClicked(MouseEvent event) {}
+            @Override
+            public void mouseReleased(MouseEvent event) {}
             @Override
             public void mouseEntered(MouseEvent event) {}
             @Override
