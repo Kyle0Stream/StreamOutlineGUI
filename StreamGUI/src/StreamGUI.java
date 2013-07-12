@@ -1,34 +1,9 @@
- /* Notes by Forrest (7/1/2013)
- * 
- *  Things to get from the image (e.g. DSCN001.JPG or DSCN001.PNG) itself:  
- *      - image width, image height
- *      - locations of the four corners of the square (in pixels)
- * 
- * Things to get from the user:
- *      - Which corners are which: label ABCD the red(?) corners of the square
- *      - Horizontal Field of View (HFOV) of the camera that took the pictures.
- *        (we think our red/silver cameras are either 67.5 or 69.5 or something,
- *         but we need our software to work for all cameras).
- * 
- *      - Real-world length of each side of the square (e.g. 8)
- * 
- * Then, either:
- *      A) create a text file (e.g. DSCN001.input.txt) with all the info.
- *         and run the MatLab program that will do the actual conversion
- *   or B) we should translate the MatLab program into Java, and actually do
- *        the math needed to "rectify" the perspective of the image
- * 
- * Eventually, we may want a program (probably a separate program?) for merging
- * multiple rectified images. We'll deal with that later.
- */
-
 /**
  *
- * @author kl0601084
+ * @author Kyle Lusk
  */
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,6 +26,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import streamoutlining.ImageUtils;
+import streamoutlining.ControlPoint;
+import streamoutlining.SquareCorner;
 
 public class StreamGUI extends JFrame
 {
@@ -301,51 +278,26 @@ public class StreamGUI extends JFrame
             @Override
             public void mousePressed(MouseEvent event) 
             {
-                    if(clickCount==0)
-                    {
-                        int AX = (event.getX());
-                        int AY = (event.getY());
-                        Point pA = new Point(AX,AY);
-                        Point closestA = ImageUtils.getNearestPointFromList(pA, yellowPoints);
-                        String strAX = String.valueOf(closestA.x);
-                        String strAY = String.valueOf(closestA.y);
-                        cornerAXText.setText(strAX);
-                        cornerAYText.setText(strAY);
-                    }
-                    if(clickCount==1)
-                    {
-                        int BX = (event.getX());
-                        int BY = (event.getY());
-                        Point pB = new Point(BX,BY);
-                        Point closestB = ImageUtils.getNearestPointFromList(pB, yellowPoints);
-                        String strBX = String.valueOf(closestB.x);
-                        String strBY = String.valueOf(closestB.y);
-                        cornerBXText.setText(strBX);
-                        cornerBYText.setText(strBY);
-                    }
-                    if(clickCount==2)
-                    {
-                        int CX = (event.getX());
-                        int CY = (event.getY());
-                        Point pC = new Point(CX,CY);
-                        Point closestC = ImageUtils.getNearestPointFromList(pC, yellowPoints);
-                        String strCX = String.valueOf(closestC.x);
-                        String strCY = String.valueOf(closestC.y);
-                        cornerCXText.setText(strCX);
-                        cornerCYText.setText(strCY);
-                    }
-                    if(clickCount==3)
-                    {
-                        int DX = (event.getX());
-                        int DY = (event.getY());
-                        Point pD = new Point(DX,DY);
-                        Point closestD = ImageUtils.getNearestPointFromList(pD, yellowPoints);
-                        String strDX = String.valueOf(closestD.x);
-                        String strDY = String.valueOf(closestD.y);
-                        cornerDXText.setText(strDX);
-                        cornerDYText.setText(strDY);
-                    }
-                    clickCount++;
+                String inputValue = JOptionPane.showInputDialog("Please Enter either:"
+                        + " (control, or corner).");
+                if (inputValue.equals("control"))
+                {
+                    String controlName = JOptionPane.showInputDialog("Please Enter "
+                            + "Control Point Number.");
+                    int i = Integer.parseInt(controlName);
+                    Point p = (event.getPoint());
+                    Point pClosest = ImageUtils.getNearestPointFromList(p, redPoints);
+                    ControlPoint cp = new ControlPoint(i, pClosest);
+                    //NEED TO FIGURE OUT WHAT TO DO / HOW TO ADD cp
+                }else if(inputValue.equals("corner"))
+                {
+                    String cornerLetter = JOptionPane.showInputDialog("Please Enter"
+                            + "the letter of the corner.");
+                    Point p = (event.getPoint());
+                    Point pClosest = ImageUtils.getNearestPointFromList(p, yellowPoints);
+                    SquareCorner sq = new SquareCorner(cornerLetter, pClosest);
+                    //NEED TO FIGURE OUT WHAT TO DO / HOW TO ADD sq
+                }
             }
             @Override
             public void mouseReleased(MouseEvent event) {}
