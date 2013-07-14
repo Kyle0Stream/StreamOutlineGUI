@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,7 +31,7 @@ import streamoutlining.ImageUtils;
 
 public class StreamGUI extends JFrame
 {
-    final double SCALE_FACTOR = 4.0;
+    final double SCALE_FACTOR = 5.0;
     
     private BufferedImage JPEGImage;
     private BufferedImage pointsImage;
@@ -51,7 +50,6 @@ public class StreamGUI extends JFrame
     private JFileChooser chooser;
     
     private JFrame framePoints;
-    private JFrame frameOutline;
     private JPanel bottom;
     
     private JLabel pictureLabel;
@@ -252,27 +250,28 @@ public class StreamGUI extends JFrame
                             + " the letter of the corner.");
                     if (markerID != null)
                     {
+                        markerID = markerID.toUpperCase().trim();
                         mClosest.setID(markerID);
-                        if(markerID.equalsIgnoreCase("a"))
+                        if(markerID.equals("A"))
                         {
                             cornerAXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
                             cornerAYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                         }
-                        if(markerID.equalsIgnoreCase("b"))
+                        if(markerID.equals("B"))
                         {
                             cornerBXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
                             cornerBYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                         }
-                        if(markerID.equalsIgnoreCase("c"))
+                        if(markerID.equals("C"))
                         {
                             cornerCXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
                             cornerCYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                         }
-                        if(markerID.equalsIgnoreCase("d"))
+                        if(markerID.equals("D"))
                         {
                             cornerDXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
                             cornerDYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
-                        }   
+                        } 
                     }
                 }
                 if (markerID != null)
@@ -313,12 +312,21 @@ public class StreamGUI extends JFrame
         framePoints.add(scrollBar);
         framePoints.setTitle("Square Points and Control Points");
         framePoints.setLocation(350,0);
-        framePoints.setSize(900,700);
+        framePoints.setSize(945,710);
         framePoints.setVisible(true);
     }
     
     private void onDoneClick() throws IOException
     {
+        for (ImageMarker marker: cornerAndControlMarkers)
+        {
+            if (marker.getID() == null)
+            {
+                JOptionPane.showMessageDialog(this, "You can't be done until you've labeled every corner and control point!");
+                return;
+            }
+        }
+        
         PrintWriter miscInfo = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_miscInfo.txt")));
         PrintWriter outline = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_outline.txt")));
         PrintWriter controlPoints = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_controlpoints.txt")));
@@ -337,27 +345,29 @@ public class StreamGUI extends JFrame
         miscInfo.println("CornerD (X,Y): " + cornerDXText.getText()
                 + ", " + cornerDYText.getText());
         
-        miscInfo.println("Square Side Length: " + Double.parseDouble(sideLengthText.getText()));
-        miscInfo.println("HFOV: " + Double.parseDouble(hfovText.getText()));
+        miscInfo.println("Square Side Length: " + sideLengthText.getText());
+        miscInfo.println("HFOV: " + hfovText.getText());
 //        miscInfo.println("Outline Filename: " + outlineText.getText());
 //        miscInfo.println("Image Height, Width: " + outlineImage.getHeight() + ", " 
 //                + outlineImage.getWidth());
 
+        // Output the four corner coordinates.
         squareCorners.println(cornerAXText.getText() + "," + cornerAYText.getText());
         squareCorners.println(cornerBXText.getText() + "," + cornerBYText.getText());
         squareCorners.println(cornerCXText.getText() + "," + cornerCYText.getText());
         squareCorners.println(cornerDXText.getText() + "," + cornerDYText.getText());
-               
+
+        // Output the control point IDs and coordinates
         for (ImageMarker marker: cornerAndControlMarkers)
         {
-            if(marker.getType() == ImageMarker.MarkerType.CONTROL_POINT)
+            if (marker.getType() == ImageMarker.MarkerType.CONTROL_POINT)
             {
                 controlPoints.println(marker.getID() + "," + (marker.getLocation().x + 0.5)
                         + "," + (marker.getLocation().y + 0.5));
             }
         }
         
-        //PIXEL LOCATIONS HERE (MAGENTA)
+        // Output the stream outline data
         for (ImageMarker marker: outlineMarkers)
         {
             if(marker.getType() == ImageMarker.MarkerType.OUTLINE_POINT)
@@ -369,9 +379,10 @@ public class StreamGUI extends JFrame
         controlPoints.close();
         squareCorners.close();
         outline.close();
-        this.dispose();
+        framePoints.setVisible(false);
         framePoints.dispose();
-        frameOutline.dispose();
+        this.setVisible(false);
+        this.dispose();
     }
 
     public static void main(String[] args) throws IOException
