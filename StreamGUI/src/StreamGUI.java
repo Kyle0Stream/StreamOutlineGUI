@@ -124,8 +124,7 @@ public class StreamGUI extends JFrame
                         
                         cornerAndControlMarkers = ImageUtils.extractColoredMarkers(pointsImage);
                         outlineMarkers = ImageUtils.extractColoredMarkers(outlineImage);
-                        setupImageDisplayWindow();
-                        
+                        setupImageDisplayWindow(); 
                     } catch (IOException ex) 
                     {
                         System.out.println(ex);
@@ -241,6 +240,15 @@ public class StreamGUI extends JFrame
                             + "the control point number.");
                     if (markerID != null)
                     {
+                        for(ImageMarker m : cornerAndControlMarkers)
+                        {
+                            if(markerID.equals(m.getID()))
+                            {
+                                markerID = JOptionPane.showInputDialog("Sorry,"
+                                        + " control point already specified, enter"
+                                        + " another.");
+                            }
+                        }
                         mClosest.setID(markerID);
                     }
                     
@@ -251,6 +259,14 @@ public class StreamGUI extends JFrame
                     if (markerID != null)
                     {
                         markerID = markerID.toUpperCase().trim();
+                        for(ImageMarker m : cornerAndControlMarkers)
+                        {
+                            if(markerID.equals(m.getID()))
+                            {
+                                markerID = JOptionPane.showInputDialog("Sorry,"
+                                        + " corner already specified, enter another.");
+                            }
+                        }
                         mClosest.setID(markerID);
                         if(markerID.equals("A"))
                         {
@@ -322,7 +338,8 @@ public class StreamGUI extends JFrame
         {
             if (marker.getID() == null)
             {
-                JOptionPane.showMessageDialog(this, "You can't be done until you've labeled every corner and control point!");
+                JOptionPane.showMessageDialog(this, "You can't be done until you've "
+                        + "labeled every corner and control point!");
                 return;
             }
         }
@@ -347,9 +364,6 @@ public class StreamGUI extends JFrame
         
         miscInfo.println("Square Side Length: " + sideLengthText.getText());
         miscInfo.println("HFOV: " + hfovText.getText());
-//        miscInfo.println("Outline Filename: " + outlineText.getText());
-//        miscInfo.println("Image Height, Width: " + outlineImage.getHeight() + ", " 
-//                + outlineImage.getWidth());
 
         // Output the four corner coordinates.
         squareCorners.println(cornerAXText.getText() + "," + cornerAYText.getText());
