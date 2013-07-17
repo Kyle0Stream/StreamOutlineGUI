@@ -25,7 +25,7 @@ public class ImageUtils {
     /**
      * @param p - the point that we're measuring all the distances from
      * @param listOfMarkers - a list of points to check the distance from point P
-     * @return the Point in the list that was closest to p.
+     * @return the Point in the list that was closest to p (if any point within 200 units).
      */
     public static ImageMarker getNearestMarkerFromList(Point p, List<ImageMarker> listOfMarkers)
     {

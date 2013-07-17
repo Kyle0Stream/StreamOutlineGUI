@@ -230,83 +230,94 @@ public class StreamGUI extends JFrame
             @Override
             public void mousePressed(MouseEvent event) 
             {
-                Point pWindow = (event.getPoint());
-                Point pInOriginalImage = new Point((int)(pWindow.x*SCALE_FACTOR),(int)(pWindow.y*SCALE_FACTOR));
-                ImageMarker mClosest = ImageUtils.getNearestMarkerFromList(pInOriginalImage, cornerAndControlMarkers);
-                String markerID="";
-                if (mClosest.getType() == ImageMarker.MarkerType.CONTROL_POINT)
+                try
                 {
-                    markerID = JOptionPane.showInputDialog("Please enter "
-                            + "the control point number.");
-                    if (markerID != null)
+                    Point pWindow = (event.getPoint());
+                    Point pInOriginalImage = new Point((int)(pWindow.x*SCALE_FACTOR),(int)(pWindow.y*SCALE_FACTOR));
+                    ImageMarker mClosest = ImageUtils.getNearestMarkerFromList(pInOriginalImage, cornerAndControlMarkers);
+                    if(mClosest==null)
                     {
-                        for(ImageMarker m : cornerAndControlMarkers)
-                        {
-                            if(markerID.equals(m.getID()))
-                            {
-                                markerID = JOptionPane.showInputDialog("Sorry,"
-                                        + " control point already specified, enter"
-                                        + " another.");
-                            }
-                        }
-                        mClosest.setID(markerID);
+                        JOptionPane.showMessageDialog(framePoints, "Please click closer"
+                                + " to points.");
                     }
-                    
-                }else if(mClosest.getType() == ImageMarker.MarkerType.CORNER_POINT)
-                {
-                    markerID = JOptionPane.showInputDialog("Please enter"
-                            + " the letter of the corner.");
-                    if (markerID != null)
+                    String markerID="";
+                    if (mClosest.getType() == ImageMarker.MarkerType.CONTROL_POINT)
                     {
-                        markerID = markerID.toUpperCase().trim();
-                        for(ImageMarker m : cornerAndControlMarkers)
+                        markerID = JOptionPane.showInputDialog("Please enter "
+                                + "the control point number.");
+                        if (markerID != null)
                         {
-                            if(markerID.equals(m.getID()))
+                            for(ImageMarker m : cornerAndControlMarkers)
                             {
-                                markerID = JOptionPane.showInputDialog("Sorry,"
-                                        + " corner already specified, enter another.");
+                                if(markerID.equals(m.getID()))
+                                {
+                                    markerID = JOptionPane.showInputDialog("Sorry,"
+                                            + " control point already specified, enter"
+                                            + " another.");
+                                }
+                            }
+                            mClosest.setID(markerID);
+                        }
+                    }else if(mClosest.getType() == ImageMarker.MarkerType.CORNER_POINT)
+                    {
+                        markerID = JOptionPane.showInputDialog("Please enter"
+                                + " the letter of the corner.");
+                        if (markerID != null)
+                        {
+                            markerID = markerID.toUpperCase().trim();
+                            for(ImageMarker m : cornerAndControlMarkers)
+                            {
+                                if(markerID.equals(m.getID()))
+                                {
+                                    markerID = JOptionPane.showInputDialog("Sorry,"
+                                            + " corner already specified, enter another.");
+                                }
+                            }
+                            mClosest.setID(markerID);
+                            if(markerID.equals("A"))
+                            {
+                                cornerAXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
+                                cornerAYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
+                            }
+                            if(markerID.equals("B"))
+                            {
+                                cornerBXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
+                                cornerBYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
+                            }
+                            if (markerID.equals("C")) 
+                            {
+                                cornerCXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
+                                cornerCYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
+                            }
+                            if (markerID.equals("D")) 
+                            {
+                                cornerDXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
+                                cornerDYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
                             }
                         }
-                        mClosest.setID(markerID);
-                        if(markerID.equals("A"))
-                        {
-                            cornerAXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
-                            cornerAYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
-                        }
-                        if(markerID.equals("B"))
-                        {
-                            cornerBXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
-                            cornerBYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
-                        }
-                        if(markerID.equals("C"))
-                        {
-                            cornerCXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
-                            cornerCYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
-                        }
-                        if(markerID.equals("D"))
-                        {
-                            cornerDXText.setText(String.valueOf(mClosest.getLocation().x + 0.5));
-                            cornerDYText.setText(String.valueOf(mClosest.getLocation().y + 0.5));
-                        } 
+                    }
+                    if (markerID != null) 
+                    {
+                        Graphics2D g = allThreeShrunk.createGraphics();
+                        g.setColor(Color.GRAY);
+                        int centerx = (int) (mClosest.getLocation().x / SCALE_FACTOR);
+                        int centery = (int) (mClosest.getLocation().y / SCALE_FACTOR);
+                        g.fillOval(centerx - 2, centery - 2, 5, 5);
+                        g.setColor(Color.BLACK);
+                        g.drawString(markerID, centerx + 4, centery + 4);
+                        g.drawString(markerID, centerx + 6, centery + 4);
+                        g.drawString(markerID, centerx + 4, centery + 6);
+                        g.drawString(markerID, centerx + 6, centery + 6);
+                        g.setColor(Color.WHITE);
+                        g.drawString(markerID, centerx + 5, centery + 5);
+                        g.dispose();
+                        pictureLabel.repaint();
                     }
                 }
-                if (markerID != null)
+                catch(Exception ex)
                 {
-                    Graphics2D g = allThreeShrunk.createGraphics();
-                    g.setColor(Color.GRAY);
-                    int centerx = (int)(mClosest.getLocation().x/SCALE_FACTOR);
-                    int centery = (int)(mClosest.getLocation().y/SCALE_FACTOR);
-                    g.fillOval(centerx-2,centery-2,5,5);
-                    g.setColor(Color.BLACK);
-                    g.drawString(markerID, centerx+4,centery+4);
-                    g.drawString(markerID, centerx+6,centery+4);
-                    g.drawString(markerID, centerx+4,centery+6);
-                    g.drawString(markerID, centerx+6,centery+6);
-                    g.setColor(Color.WHITE);
-                    g.drawString(markerID, centerx+5,centery+5);
-                    g.dispose();
-                    pictureLabel.repaint();                   
-                }                
+                    System.out.println(ex);
+                }
             }
             @Override
             public void mouseClicked(MouseEvent event) {}
