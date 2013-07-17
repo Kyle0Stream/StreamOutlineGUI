@@ -92,11 +92,12 @@ public class StreamGUI extends JFrame
     public StreamGUI() throws IOException
     {
         bottom = new JPanel();
-
-         chooser = new JFileChooser();
-         chooser.setCurrentDirectory(new File("."));
-         FileFilter filter = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
-         chooser.addChoosableFileFilter(filter);
+        
+        chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File("."));
+        FileFilter filter = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.addChoosableFileFilter(filter);
         //CREATES TEXT FIELD AND LABEL for POINTS BROWSE
         JPGLabel = new JLabel("JPG File: ");
         JPEGText = new JTextField(fieldWidth);
