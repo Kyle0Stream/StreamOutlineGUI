@@ -37,8 +37,11 @@ public class ImageUtils {
             double distToThisPoint = p.distance(marker.getLocation());
             if (distToThisPoint < shortestDistanceSoFar)
             {
-                shortestDistanceSoFar = distToThisPoint;
-                nearestMarker = marker;
+                if(distToThisPoint<200.0)
+                {
+                    shortestDistanceSoFar = distToThisPoint;
+                    nearestMarker = marker;
+                }
             }
         }
         return nearestMarker;
