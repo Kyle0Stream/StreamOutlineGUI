@@ -26,6 +26,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import streamoutlining.ImageMarker;
 import streamoutlining.ImageUtils;
 
@@ -93,6 +95,8 @@ public class StreamGUI extends JFrame
 
          chooser = new JFileChooser();
          chooser.setCurrentDirectory(new File("."));
+         FileFilter filter = new FileNameExtensionFilter("JPEG file", "jpg", "jpeg");
+         chooser.addChoosableFileFilter(filter);
         //CREATES TEXT FIELD AND LABEL for POINTS BROWSE
         JPGLabel = new JLabel("JPG File: ");
         JPEGText = new JTextField(fieldWidth);
@@ -271,6 +275,7 @@ public class StreamGUI extends JFrame
                                 {
                                     markerID = JOptionPane.showInputDialog("Sorry,"
                                             + " corner already specified, enter another.");
+                                    markerID = markerID.toUpperCase().trim();
                                 }
                             }
                             mClosest.setID(markerID);
