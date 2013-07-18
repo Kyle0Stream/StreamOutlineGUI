@@ -122,20 +122,21 @@ public class ImageUtils {
                     // used to be the certain color, but then were transparent
                     Color pixelColor = new Color(img.getRGB(x, y), true);
                     // check if the pixel color (and alpha) matches
-                    if (pixelColor.equals(Color.yellow)) {
+                    if (pixelColor.getRed() > 250 && pixelColor.getGreen() > 250 && pixelColor.getBlue() < 10 && pixelColor.getAlpha() > 128) {
+                        //YELLOW
                         markerList.add(new ImageMarker(ImageMarker.MarkerType.CORNER_POINT, new Point(x, y)));
                     }
-                    else if (pixelColor.equals(Color.red)) {
+                    else if (pixelColor.getRed() > 250 && pixelColor.getGreen() < 10 && pixelColor.getBlue() < 10 && pixelColor.getAlpha() > 128) {
                         markerList.add(new ImageMarker(ImageMarker.MarkerType.CONTROL_POINT, new Point(x, y)));
                     }
-                    else if (pixelColor.equals(Color.magenta)) {
+                    else if (pixelColor.getRed() > 250 && pixelColor.getGreen() < 10 && pixelColor.getBlue() > 250 && pixelColor.getAlpha() > 128) {
                         markerList.add(new ImageMarker(ImageMarker.MarkerType.OUTLINE_POINT, new Point(x, y)));                        
                     }
-//                    else if (pixelColor.getAlpha() > 0)
-//                    {
-//                        // we found an incorrectly colored non-transparent pixel, sound error!
-//                        throw new RuntimeException("Image contained non-transparent pixel of invalid color: " + pixelColor);
-//                    }
+                    else if (pixelColor.getAlpha() > 128)
+                    {
+                        // we found an incorrectly colored non-transparent pixel, sound error!
+                        throw new RuntimeException("Image contained non-transparent pixel of invalid color: " + pixelColor);
+                    }
                 }
             }
         return markerList;
