@@ -250,16 +250,23 @@ public class StreamGUI extends JFrame
                     {
                         markerID = JOptionPane.showInputDialog("Please enter "
                                 + "the control point number.");
+                        markerID = markerID.trim();
                         if (markerID != null)
                         {
+                            boolean foundDuplicate = false;
                             for(ImageMarker m : cornerAndControlMarkers)
                             {
-                                if(markerID.equals(m.getID()))
+                                if(markerID.equals(m.getID()) && !markerID.startsWith("-"))
                                 {
-                                    markerID = JOptionPane.showInputDialog("Sorry,"
-                                            + " control point already specified, enter"
-                                            + " another.");
+                                    foundDuplicate = true;
+                                    break;
                                 }
+                            }
+                            if (foundDuplicate)
+                            {
+                                markerID = JOptionPane.showInputDialog("Sorry,"
+                                    + " control point already specified, enter"
+                                    + " another (or re-enter if you are sure).");
                             }
                             mClosest.setID(markerID);
                         }
