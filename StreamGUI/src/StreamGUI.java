@@ -343,7 +343,7 @@ public class StreamGUI extends JFrame
         JScrollPane scrollBar=new JScrollPane(pictureLabel,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         framePoints.add(scrollBar);
-        framePoints.setTitle("Square Points and Control Points");
+        framePoints.setTitle("Overlayed Points and Outline");
         framePoints.setLocation(350,0);
         framePoints.setSize(945,710);
         framePoints.setVisible(true);
