@@ -255,6 +255,14 @@ public class StreamGUI extends JFrame
                         markerID = JOptionPane.showInputDialog("Please enter "
                                 + "the control point number.");
                         markerID = markerID.trim();
+                        if(!markerID.contains("1")&& !markerID.contains("2") && !markerID.contains("3")
+                                && !markerID.contains("4")&& !markerID.contains("5")
+                                && !markerID.contains("6")&& !markerID.contains("7")
+                                && !markerID.contains("8")&& !markerID.contains("9")
+                                && !markerID.contains("0"))
+                        {
+                            markerID = JOptionPane.showInputDialog("Please enter a number.");
+                        }
                         if (markerID != null)
                         {
                             boolean foundDuplicate = false;
@@ -281,6 +289,15 @@ public class StreamGUI extends JFrame
                         if (markerID != null)
                         {
                             markerID = markerID.toUpperCase().trim();
+                            if(markerID.contains("1")|| markerID.contains("2") || markerID.contains("3")
+                                || markerID.contains("4")|| markerID.contains("5")
+                                || markerID.contains("6")|| markerID.contains("7")
+                                || markerID.contains("8")|| markerID.contains("9")
+                                || markerID.contains("0"))
+                            {
+                                markerID = JOptionPane.showInputDialog("Please enter a letter.");
+                                markerID = markerID.toUpperCase().trim();
+                            }
                             for(ImageMarker m : cornerAndControlMarkers)
                             {
                                 if(markerID.equals(m.getID()))
@@ -412,6 +429,7 @@ public class StreamGUI extends JFrame
         squareCorners.close();
         outline.close();
     }
+    
     private void onDoneClick() throws IOException
     {
         for (ImageMarker marker: cornerAndControlMarkers)
@@ -423,7 +441,6 @@ public class StreamGUI extends JFrame
                 return;
             }
         }
-        
         int choice;
         choice = JOptionPane.showConfirmDialog(null, "Would you like to do another picture??", 
                 "Message", JOptionPane.YES_NO_OPTION);
