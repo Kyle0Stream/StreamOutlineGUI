@@ -48,6 +48,10 @@ public class StreamGUI extends JFrame
     private ArrayList<ImageMarker> outlineMarkers;
     
     private File myfile;
+    private PrintWriter miscInfo;
+    private PrintWriter outline;
+    private PrintWriter squareCorners;
+    private PrintWriter controlPoints;
     
     private JFileChooser chooser;
     
@@ -356,22 +360,12 @@ public class StreamGUI extends JFrame
         framePoints.setVisible(true);
     }
     
-    private void onDoneClick() throws IOException
+    private void outputHelper() throws IOException
     {
-        for (ImageMarker marker: cornerAndControlMarkers)
-        {
-            if (marker.getID() == null)
-            {
-                JOptionPane.showMessageDialog(this, "You can't be done until you've "
-                        + "labeled every corner and control point!");
-                return;
-            }
-        }
-        
-        PrintWriter miscInfo = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_miscInfo.txt")));
-        PrintWriter outline = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_outline.txt")));
-        PrintWriter controlPoints = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_controlpoints.txt")));
-        PrintWriter squareCorners = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_corners.txt")));
+        miscInfo = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_miscInfo.txt")));
+        outline = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_outline.txt")));
+        controlPoints = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_controlpoints.txt")));
+        squareCorners = new PrintWriter(new FileWriter(JPEGFileName.replace(".JPG", "_corners.txt")));
 
         miscInfo.println("JPG Filename: " + JPEGFileName);
 
@@ -417,10 +411,46 @@ public class StreamGUI extends JFrame
         controlPoints.close();
         squareCorners.close();
         outline.close();
-        framePoints.setVisible(false);
-        framePoints.dispose();
-        this.setVisible(false);
-        this.dispose();
+    }
+    private void onDoneClick() throws IOException
+    {
+        for (ImageMarker marker: cornerAndControlMarkers)
+        {
+            if (marker.getID() == null)
+            {
+                JOptionPane.showMessageDialog(this, "You can't be done until you've "
+                        + "labeled every corner and control point!");
+                return;
+            }
+        }
+        
+        int choice;
+        choice = JOptionPane.showConfirmDialog(null, "Would you like to do another picture??", 
+                "Message", JOptionPane.YES_NO_OPTION);
+        if (choice==0)
+        {//YES
+            outputHelper();
+            cornerAXText.setText("");
+            cornerAYText.setText("");
+            cornerBXText.setText("");
+            cornerBYText.setText("");
+            cornerCXText.setText("");
+            cornerCYText.setText("");
+            cornerDXText.setText("");
+            cornerDYText.setText("");
+            sideLengthText.setText("");
+            hfovText.setText("");
+            JPEGText.setText("");
+            framePoints.setVisible(true);
+            framePoints.dispose();
+        }else if(choice==1)
+        {//NO
+            outputHelper();
+            framePoints.setVisible(false);
+            framePoints.dispose();
+            this.setVisible(false);
+            this.dispose();
+        }
     }
 
     public static void main(String[] args) throws IOException
