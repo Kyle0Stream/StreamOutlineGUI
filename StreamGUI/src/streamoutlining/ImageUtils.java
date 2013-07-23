@@ -134,7 +134,7 @@ public class ImageUtils {
                     }
                     else if (pixelColor.getAlpha() > 128)
                     {
-                        // we found an incorrectly colored non-transparent pixel, sound error!
+                        // we found an incorrectly colored non-transparent pixel, sound error!z
                         throw new RuntimeException("Image contained non-transparent pixel of invalid color: " + pixelColor);
                     }
                 }
