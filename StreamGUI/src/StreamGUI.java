@@ -133,10 +133,20 @@ public class StreamGUI extends JFrame
                         
                         cornerAndControlMarkers = ImageUtils.extractColoredMarkers(pointsImage);
                         outlineMarkers = ImageUtils.extractColoredMarkers(outlineImage);
+                        if(ImageUtils.check==true)
+                        {
+                            JOptionPane.showMessageDialog(framePoints, "Image "
+                                    + "contained non-transparent pixel of invalid color,"
+                                    + " browse again.");
+                            JPEGText.setText("");
+                        }
                         setupImageDisplayWindow(); 
                     } catch (IOException ex) 
                     {
-                        System.out.println(ex);
+                        JOptionPane.showMessageDialog(framePoints, JPEGText.getText() 
+                                + " does not have matching points.png or outline.png,"
+                                + " browse again.");
+                        JPEGText.setText("");
                     }
                 }
             }
@@ -455,7 +465,7 @@ public class StreamGUI extends JFrame
             cornerCYText.setText("");
             cornerDXText.setText("");
             cornerDYText.setText("");
-            sideLengthText.setText("");
+            sideLengthText.setText("8");
             hfovText.setText("");
             JPEGText.setText("");
             framePoints.setVisible(true);
